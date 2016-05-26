@@ -34,6 +34,7 @@
 #include "grins/variable_warehouse.h"
 #include "grins/multi_component_vector_variable.h"
 #include "grins/single_variable.h"
+#include "grins/physics_naming.h"
 
 // libMesh
 #include "libmesh/quadrature.h"
@@ -45,8 +46,8 @@ namespace GRINS
 {
 
   SpalartAllmarasHelper::SpalartAllmarasHelper(const GetPot& input )
-    : _flow_vars(GRINSPrivate::VariableWarehouse::get_variable_subclass<VelocityVariable>(VariablesParsing::velocity_section())),
-      _press_var(GRINSPrivate::VariableWarehouse::get_variable_subclass<PressureFEVariable>(VariablesParsing::pressure_section()))
+    : _flow_vars(GRINSPrivate::VariableWarehouse::get_variable_subclass<VelocityVariable>(VariablesParsing::physics_velocity_variable_name(input,PhysicsNaming::spalart_allmaras()))),
+      _press_var(GRINSPrivate::VariableWarehouse::get_variable_subclass<PressureFEVariable>(VariablesParsing::physics_press_variable_name(input,PhysicsNaming::spalart_allmaras())))
   {}
 
   libMesh::Real SpalartAllmarasHelper::vorticity(AssemblyContext& context, unsigned int qp) const
