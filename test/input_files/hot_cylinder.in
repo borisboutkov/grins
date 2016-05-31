@@ -55,12 +55,6 @@
 []
 
 [Variables]
-   [./Temperature]
-      names = 'T'
-      fe_family = 'LAGRANGE'
-      order = 'FIRST'
-   [../]
-
    [./Velocity]
       names = 'Ux Uy'
       fe_family = 'LAGRANGE'
@@ -75,6 +69,11 @@
       enabled_subdomains = '2'
    [../]
 
+   [./Temperature]
+      names = 'T'
+      fe_family = 'LAGRANGE'
+      order = 'FIRST'
+   [../]
 []
 
 [Mesh]
