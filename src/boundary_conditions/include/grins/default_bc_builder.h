@@ -27,6 +27,7 @@
 
 // GRINS
 #include "grins/bc_builder.h"
+#include "grins/builder_helper.h"
 
 // libMesh foward declarations
 namespace libMesh
@@ -43,12 +44,14 @@ namespace GRINS
       classes. This builder classes merely manages tasks around the
       factories as needed.  To add new Dirichlet boundary conditions,
       the user should instantiate an appropriate factory sub class. */
-  class DefaultBCBuilder : public BCBuilder
+  class DefaultBCBuilder : public BCBuilder,
+                           public BuilderHelper
   {
   public:
 
     DefaultBCBuilder()
-      : BCBuilder()
+      : BCBuilder(),
+        BuilderHelper()
     {};
 
     ~DefaultBCBuilder(){};
@@ -86,6 +89,7 @@ namespace GRINS
                                   const std::set<BoundaryID>& bc_ids,
                                   libMesh::DofMap& dof_map,
                                   std::set<std::string>& var_sections,
+                                  const std::map<BoundaryID,std::vector<libMesh::subdomain_id_type> >& bc_id_to_subdomain_id_map,
                                   std::vector<SharedPtr<NeumannBCContainer> >& neumann_bcs);
 
     void parse_and_build_bc_id_map( const GetPot& input,
@@ -93,8 +97,6 @@ namespace GRINS
 
     void verify_bc_ids_with_mesh( const MultiphysicsSystem& system,
                                   const std::map<std::string,std::set<BoundaryID> >& bc_id_map ) const;
-
-    void parse_var_sections( const GetPot& input, std::set<std::string>& sections );
 
     void build_periodic_bc( const GetPot& input,
                             libMesh::System& system,
@@ -108,6 +110,18 @@ namespace GRINS
 
     libMesh::RealVectorValue parse_periodic_offset(const GetPot& input,
                                                    const std::string& section) const;
+
+    //! Build up bc_id to subdomain_id map
+    /*! we also check and make sure that there's only one subdomain id
+        per boundary id. If not, we throw an error. */
+    void build_bc_to_subdomain_map_check_with_mesh
+    ( const MultiphysicsSystem& system,
+      std::map<BoundaryID,std::vector<libMesh::subdomain_id_type> >& bc_id_to_subdomain_id_map ) const;
+
+    //! Check if the Variable var is active on the given subdomain_id
+    bool is_var_active( const FEVariablesBase& var,
+                        const std::vector<libMesh::subdomain_id_type>& subdomain_ids ) const;
+
   };
 } // end namespace GRINS
 

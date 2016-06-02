@@ -36,11 +36,14 @@
 #include "grins/physics_naming.h"
 #include "grins/cached_values.h"
 #include "grins/parameter_user.h"
+#include "grins/assembly_context.h"
 
 //libMesh
 #include "libmesh/libmesh.h"
 #include "libmesh/point.h"
 #include "libmesh/fe_base.h"
+#include "libmesh/system.h"
+#include "libmesh/mesh_base.h"
 
 // GRVY
 #ifdef GRINS_HAVE_GRVY
@@ -69,8 +72,8 @@ namespace GRINS
   class ICHandlingBase;
   class NBCContainer;
   class DBCContainer;
-  class AssemblyContext;
   class MultiphysicsSystem;
+  class FEVariablesBase;
 
   template <typename Scalar>
   class PostProcessedQuantities;
@@ -113,7 +116,7 @@ namespace GRINS
     virtual ~Physics();
 
     //! Initialize variables for this physics.
-    virtual void init_variables( libMesh::FEMSystem* system ) = 0;
+    virtual void init_variables( libMesh::FEMSystem* /*system*/ ){};
 
     //! Find if current physics is active on supplied element
     virtual bool enabled_on_elem( const libMesh::Elem* elem );
@@ -257,6 +260,12 @@ namespace GRINS
 
     void parse_enabled_subdomains( const GetPot& input,
                                    const std::string& physics_name );
+
+    unsigned int mesh_dim( const AssemblyContext& context ) const
+    { return context.get_system().get_mesh().mesh_dimension(); }
+
+    //! Check that var is enabled on at least the subdomains this Physics is
+    void check_var_subdomain_consistency( const FEVariablesBase& var ) const;
 
     //! Name of the physics object. Used for reading physics specific inputs.
     /*! We use a reference because the physics names are const global objects
