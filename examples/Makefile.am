@@ -67,6 +67,14 @@ EXTRA_DIST += $(cavitybenchmark_DATA)
 cavity_SOURCES = cavity_benchmark/cavity.C
 cavity_LDADD = $(LIBGRINS_LIBS)
 
+#=======================================================================
+# Kinetics 0D Example
+#=======================================================================
+kinetics_0ddir = $(prefix)/examples/kinetics_0d
+kinetics_0d_DATA  = $(top_srcdir)/examples/kinetics_0d/kinetics_0d.in
+kinetics_0d_SCRIPTS = $(top_builddir)/examples/kinetics_0d/run.sh
+
+EXTRA_DIST += $(kinetics_0d_DATA)
 
 #=======================================================================
 # Lid-Driven Cavity Example
