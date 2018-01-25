@@ -119,6 +119,9 @@ namespace GRINS
     static PhysicsName scalar_ode()
     { return "ScalarODE"+suffix(); }
 
+    static PhysicsName kinetics0D()
+    { return "Kinetics0D"+suffix(); }
+
     static PhysicsName heat_conduction()
     { return "HeatConduction"+suffix(); }
 
