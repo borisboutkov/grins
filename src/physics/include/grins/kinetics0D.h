@@ -23,21 +23,24 @@
 //-----------------------------------------------------------------------el-
 
 
-#ifndef GRINS_KINETICS_0D_H
-#define GRINS_KINETICS_0D_H
+#ifndef GRINS_KINETICS0D_H
+#define GRINS_KINETICS0D_H
 
 #include "grins/scalar_ode.h"
 #include "grins/multicomponent_variable.h"
 
 namespace GRINS
 {
-  class Kinetics0d : public ScalarODE
+  template<typename Mixture, typename Evaluator>
+  class Kinetics0D : public ScalarODE
   {
   public:
 
-    Kinetics0d( const std::string & physics_name, const GetPot & input );
+    Kinetics0D(const PhysicsName& physics_name, const GetPot& input,
+                                std::unique_ptr<Mixture> & gas_mix);
 
-    virtual ~Kinetics0d(){}
+
+    virtual ~Kinetics0D(){}
 
     // Context initialization
     virtual void init_context( AssemblyContext& context );
@@ -51,25 +54,47 @@ namespace GRINS
                                 AssemblyContext & context );
 
 
+    virtual void compute_element_time_derivative_cache( AssemblyContext & context );
   protected:
 
     //! Index from registering this quantity
     unsigned int _n_species;
 
+    //! Index from registering this quantity
+    unsigned int _rho_index;
+
+    //! Index from registering this quantity. Each species will have it's own index.
+    std::vector<unsigned int> _species_viscosity;
+
+    //! Index from registering this quantity
+    unsigned int _mu_index;
+
+    //! Index from registering this quantity
+    unsigned int _k_index;
+
+    //! Index from registering this quantity
+    unsigned int _cp_index;
+
     //! Index from registering this quantity. Each species will have it's own index.
     std::vector<unsigned int> _mole_fractions_index;
 
     //! Index from registering this quantity. Each species will have it's own index.
+    std::vector<unsigned int> _h_s_index;
+
+    //! Index from registering this quantity. Each species will have it's own index.
     std::vector<unsigned int> _omega_dot_index;
+
+    //! Index from registering this quantity. Each species will have it's own index.
+    std::vector<unsigned int> _Ds_index;
 
     SpeciesMassFractionsVariable & _species_vars;
 
   private:
 
-    Kinetics0d();
+    Kinetics0D();
 
   };
 
 } // namespace GRINS
 
-#endif //GRINS_KINETICS_0D_H
+#endif //GRINS_KINETICS0D_H

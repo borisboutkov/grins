@@ -374,7 +374,7 @@ dnl-----------------------------------------------
 dnl Generate run scripts for examples
 dnl-----------------------------------------------
 AC_CONFIG_FILES(examples/cavity_benchmark/run.sh,	     [chmod +x examples/cavity_benchmark/run.sh])
-AC_CONFIG_FILES(examples/kinetics_0d/run.sh,	     [chmod +x examples/kinetics_0d/run.sh])
+AC_CONFIG_FILES(examples/kinetics0D/run.sh,	             [chmod +x examples/kinetics0D/run.sh])
 AC_CONFIG_FILES(examples/backward_facing_step/run.sh,	     [chmod +x examples/backward_facing_step/run.sh])
 AC_CONFIG_FILES(examples/lid_driven_cavity/run.sh,	         [chmod +x examples/lid_driven_cavity/run.sh])
 AC_CONFIG_FILES(examples/velocity_penalty/run.sh,	         [chmod +x examples/velocity_penalty/run.sh])
