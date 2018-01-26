@@ -31,15 +31,16 @@
 
 namespace GRINS
 {
-  template<typename Mixture, typename Evaluator>
-  class Kinetics0D : public ScalarODE
-  {
+  template < typename Mixture, typename Evaluator >
+    class Kinetics0D : public ScalarODE  {
+
   public:
 
+    // Constructor
     Kinetics0D(const PhysicsName& physics_name, const GetPot& input,
                                 std::unique_ptr<Mixture> & gas_mix);
 
-
+    // Destructor
     virtual ~Kinetics0D(){}
 
     // Context initialization
@@ -53,8 +54,24 @@ namespace GRINS
     virtual void mass_residual( bool compute_jacobian,
                                 AssemblyContext & context );
 
+    //! Sets temp variables to be time-evolving
+    virtual void set_time_evolving_vars( libMesh::FEMSystem* system );
+
 
     virtual void compute_element_time_derivative_cache( AssemblyContext & context );
+
+    unsigned int n_species() const;
+
+    const Mixture & gas_mixture() const;
+
+    libMesh::Real T( const libMesh::Point& p, const AssemblyContext& c ) const;
+
+    void mass_fractions( const libMesh::Point& p, const AssemblyContext& c,
+                         std::vector<libMesh::Real>& mass_fracs ) const;
+
+    libMesh::Real rho( libMesh::Real T, libMesh::Real p0, libMesh::Real R_mix) const;
+
+
   protected:
 
     //! Index from registering this quantity
@@ -87,13 +104,22 @@ namespace GRINS
     //! Index from registering this quantity. Each species will have it's own index.
     std::vector<unsigned int> _Ds_index;
 
+    libMesh::Number _p0;
+
+    PrimitiveTempFEVariables& _temp_vars;
+
     SpeciesMassFractionsVariable & _species_vars;
+
+    std::unique_ptr<Mixture> _gas_mixture;
 
   private:
 
+    //! Read options from GetPot input file.
+    void read_input_options( const GetPot& input );
+
     Kinetics0D();
 
-  };
+  }; //class Kinetics0D
 
 } // namespace GRINS
 

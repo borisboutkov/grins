@@ -12,7 +12,7 @@
 [Physics]
    enabled_physics = 'Kinetics0D'
 
-   [./Kinetics0D]
+   [./ReactingLowMachNavierStokes]
 
       material = 'OzoneGas'
 

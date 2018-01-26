@@ -32,6 +32,7 @@
 #include "grins/generic_ic_handler.h"
 #include "grins/variables_parsing.h"
 #include "grins/variable_warehouse.h"
+#include "grins/materials_parsing.h"
 
 // libMesh
 #include "libmesh/quadrature.h"
@@ -41,16 +42,21 @@ namespace GRINS
 {
 
   template<typename Mixture, typename Evaluator>
-  Kinetics0D<Mixture,Evaluator>::Kinetics0D(const PhysicsName& physics_name,
+  Kinetics0D <Mixture,Evaluator>::Kinetics0D(const PhysicsName& physics_name,
                                             const GetPot& input,
                                             std::unique_ptr<Mixture> & gas_mix)
-    : /*Kinetics0dBase<Mixture>(physics_name,input,gas_mix),*/
-    _rho_index(0),
-    _mu_index(0),
-    _k_index(0),
-    _cp_index(0)
+    : ScalarODE(physics_name,input),
+      _temp_vars(GRINSPrivate::VariableWarehouse::get_variable_subclass<PrimitiveTempFEVariables>(VariablesParsing::temp_variable_name(input,physics_name,VariablesParsing::PHYSICS))),
+      _species_vars(GRINSPrivate::VariableWarehouse::get_variable_subclass<SpeciesMassFractionsVariable>(VariablesParsing::species_mass_frac_variable_name(input,physics_name,VariablesParsing::PHYSICS))),
+      _gas_mixture(gas_mix.release()),
+      _rho_index(0),
+      _mu_index(0),
+      _k_index(0),
+      _cp_index(0)
   {
     this->_ic_handler = new GenericICHandler( physics_name, input );
+
+    this->read_input_options(input);
   }
 
   template<typename Mixture, typename Evaluator>
@@ -67,7 +73,7 @@ namespace GRINS
   }
 
 
-   template<typename Mixture, typename Evaluator>
+  template<typename Mixture, typename Evaluator>
   void Kinetics0D<Mixture,Evaluator>::element_time_derivative
   ( bool compute_jacobian, AssemblyContext & context )
   {
@@ -81,12 +87,12 @@ namespace GRINS
 
     // The number of local degrees of freedom in each variable.
     const unsigned int n_s_dofs = context.get_dof_indices(s0_var).size();
-        const unsigned int n_T_dofs = context.get_dof_indices(this->_temp_vars.T()).size();
+    const unsigned int n_T_dofs = context.get_dof_indices(this->_temp_vars.T()).size();
 
-        // Element Jacobian * quadrature weights for interior integration.
-        const std::vector<libMesh::Real>& JxW;
+    // Element Jacobian * quadrature weights for interior integration.
+    const std::vector<libMesh::Real>& JxW;
 
-        // The species shape functions at interior quadrature points.
+    // The species shape functions at interior quadrature points.
     const std::vector<std::vector<libMesh::Real> >& s_phi = context.get_element_fe(s0_var)->get_phi();
 
     // The species shape function gradients at interior quadrature points.
@@ -269,7 +275,7 @@ namespace GRINS
       }
   }
 
-   template<typename Mixture, typename Evaluator>
+  template<typename Mixture, typename Evaluator>
   void Kinetics0D<Mixture,Evaluator>::compute_element_time_derivative_cache
   ( AssemblyContext & context )
   {
