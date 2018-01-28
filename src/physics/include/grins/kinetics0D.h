@@ -57,7 +57,6 @@ namespace GRINS
     //! Sets temp variables to be time-evolving
     virtual void set_time_evolving_vars( libMesh::FEMSystem* system );
 
-
     virtual void compute_element_time_derivative_cache( AssemblyContext & context );
 
     unsigned int n_species() const;
@@ -69,8 +68,7 @@ namespace GRINS
     void mass_fractions( const libMesh::Point& p, const AssemblyContext& c,
                          std::vector<libMesh::Real>& mass_fracs ) const;
 
-    libMesh::Real rho( libMesh::Real T, libMesh::Real p0, libMesh::Real R_mix) const;
-
+    libMesh::Real rho ( libMesh::Real T, libMesh::Real p0, libMesh::Real R_mix);
 
   protected:
 

@@ -29,6 +29,7 @@
 #include "reacting_low_mach_navier_stokes.C"
 #include "reacting_low_mach_navier_stokes_stab_base.C"
 #include "reacting_low_mach_navier_stokes_spgsm_stab.C"
+#include "kinetics0D.C"
 
 #ifdef GRINS_HAVE_CANTERA
 
@@ -37,6 +38,7 @@
 
 template class GRINS::ReactingLowMachNavierStokesBase<GRINS::CanteraMixture>;
 template class GRINS::ReactingLowMachNavierStokes<GRINS::CanteraMixture,GRINS::CanteraEvaluator>;
+template class GRINS::Kinetics0D<GRINS::CanteraMixture,GRINS::CanteraEvaluator>;
 template class GRINS::ReactingLowMachNavierStokesStabilizationBase<GRINS::CanteraMixture,GRINS::CanteraEvaluator>;
 template class GRINS::ReactingLowMachNavierStokesSPGSMStabilization<GRINS::CanteraMixture,GRINS::CanteraEvaluator>;
 
@@ -51,6 +53,7 @@ template class GRINS::ReactingLowMachNavierStokesSPGSMStabilization<GRINS::Cante
 INSTANTIATE_REACTING_LOW_MACH_SUBCLASS_CONSTANT_MIXTURE(ReactingLowMachNavierStokesBase);
 
 INSTANTIATE_REACTING_LOW_MACH_SUBCLASS_CONSTANT_MIXTURE_AND_CONSTANT_EVALUATOR(ReactingLowMachNavierStokes);
+INSTANTIATE_REACTING_LOW_MACH_SUBCLASS_CONSTANT_MIXTURE_AND_CONSTANT_EVALUATOR(Kinetics0D);
 INSTANTIATE_REACTING_LOW_MACH_SUBCLASS_CONSTANT_MIXTURE_AND_CONSTANT_EVALUATOR(ReactingLowMachNavierStokesStabilizationBase);
 INSTANTIATE_REACTING_LOW_MACH_SUBCLASS_CONSTANT_MIXTURE_AND_CONSTANT_EVALUATOR(ReactingLowMachNavierStokesSPGSMStabilization);
 

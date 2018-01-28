@@ -90,7 +90,7 @@ namespace GRINS
     const unsigned int n_T_dofs = context.get_dof_indices(this->_temp_vars.T()).size();
 
     // Element Jacobian * quadrature weights for interior integration.
-    const std::vector<libMesh::Real>& JxW;
+    const std::vector<libMesh::Real> JxW;
 
     // The species shape functions at interior quadrature points.
     const std::vector<std::vector<libMesh::Real> >& s_phi = context.get_element_fe(s0_var)->get_phi();
@@ -107,7 +107,7 @@ namespace GRINS
       context.get_element_fe(this->_temp_vars.T())->get_dphi();
 
     const std::vector<libMesh::Point>& u_qpoint =
-      context.get_element_fe(this->_flow_vars.u())->get_xyz();
+      context.get_element_fe(this->_temp_vars.T())->get_xyz();
 
     libMesh::DenseSubVector<libMesh::Number> &FT = context.get_elem_residual(this->_temp_vars.T()); // R_{T}
 
@@ -197,13 +197,7 @@ namespace GRINS
     const VariableIndex s0_var = this->_species_vars.species(0);
     const unsigned int n_s_dofs = context.get_dof_indices(s0_var).size();
 
-    const std::vector<libMesh::Real> &JxW;
-
-    const std::vector<std::vector<libMesh::Real> >& p_phi =
-      context.get_element_fe(this->_press_var.p())->get_phi();
-
-    const std::vector<std::vector<libMesh::Real> >& u_phi =
-      context.get_element_fe(this->_flow_vars.u())->get_phi();
+    const std::vector<libMesh::Real> JxW;
 
     const std::vector<std::vector<libMesh::Real> >& T_phi =
       context.get_element_fe(this->_temp_vars.T())->get_phi();
@@ -219,7 +213,7 @@ namespace GRINS
     unsigned int n_qpoints = context.get_element_qrule().n_points();
 
     const std::vector<libMesh::Point>& u_qpoint =
-      context.get_element_fe(this->_flow_vars.u())->get_xyz();
+      context.get_element_fe(this->_temp_vars.T())->get_xyz();
 
     for (unsigned int qp = 0; qp != n_qpoints; ++qp)
       {
@@ -234,7 +228,7 @@ namespace GRINS
 
         Evaluator gas_evaluator( *(this->_gas_mixture) );
         const libMesh::Real R_mix = gas_evaluator.R_mix(ws);
-        const libMesh::Real p0 = this->get_p0_steady(context,qp);
+        const libMesh::Real p0 = 1; //this->get_p0_steady(context,qp);
         const libMesh::Real rho = this->rho(T, p0, R_mix);
         const libMesh::Real cp = gas_evaluator.cp(T,p0,ws);
         const libMesh::Real M = gas_evaluator.M_mix( ws );
@@ -375,5 +369,30 @@ namespace GRINS
     cache.set_vector_values(Cache::SPECIES_ENTHALPY, h_s);
     cache.set_vector_values(Cache::OMEGA_DOT, omega_dot_s);
   }
+
+  template<typename Mixture, typename Evaluator>
+  unsigned int Kinetics0D<Mixture,Evaluator>::n_species() const
+  {
+    return 1;
+  }
+
+  template<typename Mixture, typename Evaluator>
+  void Kinetics0D<Mixture,Evaluator>::read_input_options( const GetPot& input )
+  {
+
+  }
+
+  template<typename Mixture, typename Evaluator>
+  void Kinetics0D<Mixture,Evaluator>::set_time_evolving_vars( libMesh::FEMSystem * system )
+  {
+    //do nothign
+  }
+
+  template<typename Mixture, typename Evaluator>
+  libMesh::Real Kinetics0D<Mixture,Evaluator>::rho( libMesh::Real T, libMesh::Real p0, libMesh::Real R_mix)
+  {
+    return 1.0;
+  }
+
 
 } // namespace GRINS
