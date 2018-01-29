@@ -30,43 +30,6 @@
       output_vars = 'mole_fractions omega_dot'
 []
 
-[BoundaryConditions]
-   bc_ids = '0:2 3 1'
-   bc_id_name_map = 'Walls Inlet Outlet'
-
-   [./Inlet]
-      [./Temperature]
-         type = 'isothermal'
-         T = '300'
-      [../]
-
-      [./SpeciesMassFractions]
-         type = 'constant_dirichlet'
-         Y_O2 = '0.8'
-         Y_O3 = '0.2'
-      [../]
-   [../]
-
-   [./Walls]
-      [./Temperature]
-         type = 'parsed_dirichlet'
-         T = '{Tmax:=${Physics/ReactingLowMachNavierStokes/Tmax};300+(x<=0.005)*(x>0.002)*((x-0.002)*(Tmax-300)/(0.005-0.002))+(x<0.008)*(x>0.005)*((0.008-x)*(Tmax-300)/(0.008-0.005))}'
-      [../]
-      [./SpeciesMassFractions]
-         type = 'homogeneous_neumann'
-      [../]
-   [../]
-
-   [./Outlet]
-      [./Temperature]
-         type = 'homogeneous_neumann'
-      [../]
-      [./SpeciesMassFractions]
-         type = 'homogeneous_neumann'
-      [../]
-   [../]
-[]
-
 # Mesh related options
 [Mesh]
    [./Generation]
@@ -92,12 +55,15 @@
 []
 
 [Variables]
-   [./Temperature]
+  [./ScalarVariable]
+        names = "p"
+        order = 'FIRST'
+  [../Temperature]
       names = 'T'
       fe_family = 'LAGRANGE'
       order = 'FIRST'
 
-    [../SpeciesMassFractions]
+  [../SpeciesMassFractions]
       names = 'Y_'
       fe_family = 'LAGRANGE'
       order = 'FIRST'

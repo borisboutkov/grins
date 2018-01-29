@@ -74,7 +74,7 @@ namespace GRINS
 
 
   template<typename Mixture, typename Evaluator>
-  void Kinetics0D<Mixture,Evaluator>::element_time_derivative
+  void Kinetics0D<Mixture,Evaluator>::nonlocal_time_derivative
   ( bool compute_jacobian, AssemblyContext & context )
   {
     if( compute_jacobian )
@@ -190,7 +190,7 @@ namespace GRINS
   }
 
   template<typename Mixture, typename Evaluator>
-  void Kinetics0D<Mixture,Evaluator>::mass_residual
+  void Kinetics0D<Mixture,Evaluator>::nonlocal_mass_residual
   ( bool compute_jacobian, AssemblyContext & context )
   {
     const unsigned int n_T_dofs = context.get_dof_indices(this->_temp_vars.T()).size();

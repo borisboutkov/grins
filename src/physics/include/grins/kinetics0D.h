@@ -47,11 +47,11 @@ namespace GRINS
     virtual void init_context( AssemblyContext& context );
 
     // Time dependent part(s)
-    virtual void element_time_derivative( bool compute_jacobian,
+    virtual void nonlocal_time_derivative( bool compute_jacobian,
                                           AssemblyContext & context );
 
     // Mass matrix part(s)
-    virtual void mass_residual( bool compute_jacobian,
+    virtual void nonlocal_mass_residual( bool compute_jacobian,
                                 AssemblyContext & context );
 
     //! Sets temp variables to be time-evolving
