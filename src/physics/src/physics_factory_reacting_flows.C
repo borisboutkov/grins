@@ -30,6 +30,8 @@ namespace GRINS
   {
     std::string core_physics = this->find_core_physics_name(physics_name);
 
+    std::cout<< "core: " << core_physics << std::endl;
+
     std::string material = MaterialsParsing::material_name(input,core_physics);
 
     std::string thermochem_lib;

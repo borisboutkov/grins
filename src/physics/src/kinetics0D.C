@@ -55,7 +55,6 @@ namespace GRINS
       _cp_index(0)
   {
     this->_ic_handler = new GenericICHandler( physics_name, input );
-
     this->read_input_options(input);
   }
 
@@ -69,7 +68,7 @@ namespace GRINS
     context.get_side_fe(this->_temp_vars.T())->get_JxW();
     context.get_side_fe(this->_temp_vars.T())->get_phi();
     context.get_side_fe(this->_temp_vars.T())->get_dphi();
-    context.get_side_fe(this->_temp_vars.T())->get_xyz();
+
   }
 
 
@@ -373,19 +372,19 @@ namespace GRINS
   template<typename Mixture, typename Evaluator>
   unsigned int Kinetics0D<Mixture,Evaluator>::n_species() const
   {
-    return 1;
+    return _n_species;
   }
 
   template<typename Mixture, typename Evaluator>
   void Kinetics0D<Mixture,Evaluator>::read_input_options( const GetPot& input )
   {
-
+    // parse rho cp....
   }
 
   template<typename Mixture, typename Evaluator>
   void Kinetics0D<Mixture,Evaluator>::set_time_evolving_vars( libMesh::FEMSystem * system )
   {
-    //do nothign
+
   }
 
   template<typename Mixture, typename Evaluator>
