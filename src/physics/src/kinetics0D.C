@@ -94,6 +94,11 @@ namespace GRINS
     // Convenience
     const VariableIndex s0_var = this->_species_vars.species(0);
 
+    // appease unsed variables rules
+    const VariableIndex dummyscalar_var = this->scalar_ode_var();
+    const std::vector<std::vector<libMesh::Real> > & dummyval  = context.get_element_fe(dummyscalar_var)->get_phi();
+
+
     // The number of local degrees of freedom in each variable.
     const unsigned int n_s_dofs = context.get_dof_indices(s0_var).size();
     const unsigned int n_T_dofs = context.get_dof_indices(this->_temp_vars.T()).size();
