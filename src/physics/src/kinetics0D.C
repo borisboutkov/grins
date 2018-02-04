@@ -52,22 +52,32 @@ namespace GRINS
       _rho_index(0),
       _mu_index(0),
       _k_index(0),
+      _n_species(_species_vars.n_species()),
+      _p0(0),
       _cp_index(0)
   {
     this->_ic_handler = new GenericICHandler( physics_name, input );
+    //_p0_var = &GRINSPrivate::VariableWarehouse::get_variable_subclass<ThermoPressureVariable>(VariablesParsing::thermo_press_variable_name(input,physics_name,VariablesParsing::PHYSICS));
+
     this->read_input_options(input);
   }
 
   template<typename Mixture, typename Evaluator>
   void Kinetics0D<Mixture,Evaluator>::init_context( AssemblyContext& context )
   {
-    // First call base class
-    //Kinetics0dAbstract::init_context(context);
 
-    // We also need the side shape functions, etc.
-    context.get_side_fe(this->_temp_vars.T())->get_JxW();
-    context.get_side_fe(this->_temp_vars.T())->get_phi();
-    context.get_side_fe(this->_temp_vars.T())->get_dphi();
+    // We should prerequest all the data
+    // we will need to build the linear system
+    // or evaluate a quantity of interest.
+    context.get_element_fe(_species_vars.species(0))->get_JxW();
+    context.get_element_fe(_species_vars.species(0))->get_phi();
+    context.get_element_fe(_species_vars.species(0))->get_dphi();
+    context.get_element_fe(_species_vars.species(0))->get_xyz();
+
+    // We also need the temp functions
+    context.get_element_fe(this->_temp_vars.T())->get_JxW();
+    context.get_element_fe(this->_temp_vars.T())->get_phi();
+    context.get_element_fe(this->_temp_vars.T())->get_dphi();
 
   }
 
@@ -269,7 +279,7 @@ namespace GRINS
   }
 
   template<typename Mixture, typename Evaluator>
-  void Kinetics0D<Mixture,Evaluator>::compute_element_time_derivative_cache
+  void Kinetics0D<Mixture,Evaluator>::compute_nonlocal_time_derivative_cache
   ( AssemblyContext & context )
   {
     CachedValues & cache = context.get_cached_values();
@@ -283,7 +293,6 @@ namespace GRINS
     T.resize(n_qpoints);
 
     std::vector<libMesh::Gradient> grad_T;
-
     grad_T.resize(n_qpoints);
 
     std::vector<std::vector<libMesh::Real> > mass_fractions;
@@ -303,24 +312,14 @@ namespace GRINS
     std::vector<libMesh::Real> cp;
     cp.resize(n_qpoints);
 
-    std::vector<libMesh::Real> mu;
-    mu.resize(n_qpoints);
-
-    std::vector<libMesh::Real> k;
-    k.resize(n_qpoints);
-
     std::vector<std::vector<libMesh::Real> > h_s;
     h_s.resize(n_qpoints);
-
-    std::vector<std::vector<libMesh::Real> > D_s;
-    D_s.resize(n_qpoints);
 
     std::vector<std::vector<libMesh::Real> > omega_dot_s;
     omega_dot_s.resize(n_qpoints);
 
     for (unsigned int qp = 0; qp != n_qpoints; ++qp)
       {
-
         T[qp] = context.interior_value(this->_temp_vars.T(), qp);
         grad_T[qp] = context.interior_gradient(this->_temp_vars.T(), qp);
 
@@ -345,11 +344,6 @@ namespace GRINS
 
         cp[qp] = gas_evaluator.cp(T[qp], 0/*p0[qp]*/, mass_fractions[qp]);
 
-        D_s[qp].resize(this->_n_species);
-
-        gas_evaluator.mu_and_k_and_D( T[qp], rho[qp], cp[qp], mass_fractions[qp],
-                                      mu[qp], k[qp], D_s[qp] );
-
         omega_dot_s[qp].resize(this->_n_species);
         gas_evaluator.omega_dot( T[qp], rho[qp], mass_fractions[qp], omega_dot_s[qp] );
       }
@@ -362,9 +356,6 @@ namespace GRINS
     cache.set_values(Cache::MIXTURE_GAS_CONSTANT, R);
     cache.set_values(Cache::MIXTURE_DENSITY, rho);
     cache.set_values(Cache::MIXTURE_SPECIFIC_HEAT_P, cp);
-    cache.set_values(Cache::MIXTURE_VISCOSITY, mu);
-    cache.set_values(Cache::MIXTURE_THERMAL_CONDUCTIVITY, k);
-    cache.set_vector_values(Cache::DIFFUSION_COEFFS, D_s);
     cache.set_vector_values(Cache::SPECIES_ENTHALPY, h_s);
     cache.set_vector_values(Cache::OMEGA_DOT, omega_dot_s);
   }
@@ -378,7 +369,12 @@ namespace GRINS
   template<typename Mixture, typename Evaluator>
   void Kinetics0D<Mixture,Evaluator>::read_input_options( const GetPot& input )
   {
-    // parse rho cp....
+    // Read thermodynamic pressure info
+    MaterialsParsing::read_property( input,
+                                     "ThermodynamicPressure",
+                                     PhysicsNaming::reacting_low_mach_navier_stokes(),
+                                     (*this),
+                                     _p0 );
   }
 
   template<typename Mixture, typename Evaluator>

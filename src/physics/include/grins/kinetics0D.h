@@ -54,21 +54,28 @@ namespace GRINS
     virtual void nonlocal_mass_residual( bool compute_jacobian,
                                 AssemblyContext & context );
 
-    //! Sets temp variables to be time-evolving
+    // Sets temp variables to be time-evolving
     virtual void set_time_evolving_vars( libMesh::FEMSystem* system );
 
-    virtual void compute_element_time_derivative_cache( AssemblyContext & context );
 
+    virtual void compute_nonlocal_time_derivative_cache( AssemblyContext & context );
+
+    // Returns how many species are we working with
     unsigned int n_species() const;
 
+    // Function to evaluate gas mixture properties
     const Mixture & gas_mixture() const;
 
+    // Evaluate the temp
     libMesh::Real T( const libMesh::Point& p, const AssemblyContext& c ) const;
 
+    // Evaluate mass fractions
     void mass_fractions( const libMesh::Point& p, const AssemblyContext& c,
                          std::vector<libMesh::Real>& mass_fracs ) const;
 
+    // Evaluate rho
     libMesh::Real rho ( libMesh::Real T, libMesh::Real p0, libMesh::Real R_mix);
+
 
   protected:
 
@@ -102,6 +109,7 @@ namespace GRINS
     //! Index from registering this quantity. Each species will have it's own index.
     std::vector<unsigned int> _Ds_index;
 
+    // Thermodynamic pressure (assumed constant)
     libMesh::Number _p0;
 
     PrimitiveTempFEVariables& _temp_vars;
@@ -112,12 +120,12 @@ namespace GRINS
 
   private:
 
-    //! Read options from GetPot input file.
+    // Read options from GetPot input file.
     void read_input_options( const GetPot& input );
 
     Kinetics0D();
 
-  }; //class Kinetics0D
+  }; // class Kinetics0D
 
 } // namespace GRINS
 

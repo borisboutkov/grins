@@ -18,10 +18,10 @@
       material = 'OzoneGas'
 
       # Initial Conditions
-#      ic_ids = '0'
-#      ic_types = 'parsed'
-#      ic_variables = 'Y_O2:Y_O3:T'
-#      ic_values = '{0.8}{0.2}{212}'
+     # ic_ids = '0'
+     # ic_types = 'parsed'
+     # ic_variables = 'Y_O2:Y_O3:T'
+     # ic_values = '{0.8}{0.2}{212}'
 []
 
 # Mesh related options
@@ -34,10 +34,29 @@
        n_elems_x = '1'
 []
 
+
+[BoundaryConditions]
+   bc_ids = '0 1'
+   bc_id_name_map = 'Left Right'
+
+   [./Left]
+      [./Temperature]
+         type = 'isothermal'
+         T = '300'
+      [../]
+      [./SpeciesMassFractions]
+         type = 'constant_dirichlet'
+         Y_O2 = '0.8'
+         Y_O3 = '0.2'
+      [../]
+[../]
+
+
 [Materials]
   [./OzoneGas]
-
-     [./GasMixture]
+    [./ThermodynamicPressure]
+      value = '1e5' #[Pa]
+    [../GasMixture]
         thermochemistry_library = 'cantera'
         species = 'O O2 O3'
         kinetics_data = 'ozone.xml'
