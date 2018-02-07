@@ -203,8 +203,8 @@ namespace GRINS
     static PhysicsFactoryReactingFlows<Kinetics0D>
       grins_factory_kin0D
       (PhysicsNaming::kinetics0D(),
-       PhysicsNaming::reacting_low_mach_navier_stokes());
+       PhysicsNaming::kinetics0D());
 
-}
+  }
 
 } // end namespace GRINS
