@@ -57,9 +57,6 @@ namespace GRINS
     // Sets temp variables to be time-evolving
     virtual void set_time_evolving_vars( libMesh::FEMSystem* system );
 
-
-    virtual void compute_nonlocal_time_derivative_cache( AssemblyContext & context );
-
     // Returns how many species are we working with
     unsigned int n_species() const;
 
