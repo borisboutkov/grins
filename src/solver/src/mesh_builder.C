@@ -238,7 +238,8 @@ namespace GRINS
 
     // Make sure user gave us info about how many elements to use
     if( !input.have_variable("mesh-options/mesh_nx1") /* Deprecated */ &&
-        !input.have_variable("Mesh/Generation/n_elems_x") )
+        !input.have_variable("Mesh/Generation/n_elems_x") &&
+        dimension != 0 )
       {
         libmesh_error_msg("ERROR: Must supply Mesh/Generation/n_elems_x for mesh generation.");
       }
@@ -284,7 +285,12 @@ namespace GRINS
     this->deprecated_option<std::string>( input, "mesh-options/element_type", "Mesh/Generation/element_type", "default", element_type );
 
     /* Now generate the mesh. */
-    if( dimension == 1 )
+
+    if (dimension == 0)
+      {
+        libMesh::MeshTools::Generation::build_point(*mesh);
+      }
+    else if( dimension == 1 )
       {
         if(element_type=="default")
           {
