@@ -11,8 +11,10 @@
 # Enabled Physics classes
 [Physics]
    enabled_physics = 'Kinetics0D'
-   [./ReactingLowMachNavierStokes]
+   [./Kinetics0D]
+    material = 'OzoneGas'
 
+   [../ReactingLowMachNavierStokes]
     material = 'OzoneGas'
 
       # Initial Conditions
@@ -24,44 +26,12 @@
 
 # Mesh related options
 [Mesh]
-   [./Read]
-   filename = "zero_d.xda"
+#   [./Read]
+#   filename = './zeroD.xda'
+  [./Generation]
+  dimension = '0'
+
 []
-
-
-[BoundaryConditions]
-   bc_ids = '0 1'
-   bc_id_name_map = 'Left Right'
-
-   [./Left]
-      [./ScalarVariable]
-        #value = '0.0'
-      [../]
-      [./Temperature]
-         type = 'isothermal'
-         T = '300'
-      [../]
-      [./SpeciesMassFractions]
-         type = 'constant_dirichlet'
-         Y_O2 = '0.8'
-         Y_O3 = '0.2'
-      [../]
-   [../]
-   [./Right]
-      [./ScalarVariable]
-        #value = '0.0'
-      [../]
-      [./Temperature]
-         type = 'isothermal'
-         T = '300'
-      [../]
-      [./SpeciesMassFractions]
-         type = 'constant_dirichlet'
-         Y_O2 = '0.8'
-         Y_O3 = '0.2'
-      [../]
-[../]
-
 
 [Materials]
   [./OzoneGas]
