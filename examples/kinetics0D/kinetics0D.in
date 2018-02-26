@@ -14,14 +14,16 @@
    [./Kinetics0D]
     material = 'OzoneGas'
 
-   [../ReactingLowMachNavierStokes]
-    material = 'OzoneGas'
+   # Initial Conditions
+    ic_ids = '0'
+    ic_types = 'parsed'
+    ic_variables = 'Y_O2:Y_O3:T'
+    ic_values = '{0.8}{0.2}{212}'
 
-      # Initial Conditions
-     # ic_ids = '0'
-     # ic_types = 'parsed'
-     # ic_variables = 'Y_O2:Y_O3:T'
-     # ic_values = '{0.8}{0.2}{212}'
+    # specify this else : ERROR: Could not find required input parameter Physics/ReactingLowMachNavierStokes/material!
+   [../ReactingLowMachNavierStokes]
+         material = 'OzoneGas'
+
 []
 
 # Mesh related options
@@ -75,7 +77,7 @@
 
 # Visualization options
 [vis-options]
-   output_vis = 'true'
+   output_vis = 'false'
    vis_output_file_prefix = 'output'
    output_residual = 'false'
    output_format = 'ExodusII xdr'

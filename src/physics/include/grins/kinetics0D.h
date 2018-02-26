@@ -50,10 +50,6 @@ namespace GRINS
     virtual void nonlocal_time_derivative( bool compute_jacobian,
                                           AssemblyContext & context );
 
-    // Mass matrix part(s)
-    virtual void nonlocal_mass_residual( bool compute_jacobian,
-                                AssemblyContext & context );
-
     // Sets temp variables to be time-evolving
     virtual void set_time_evolving_vars( libMesh::FEMSystem* system );
 
