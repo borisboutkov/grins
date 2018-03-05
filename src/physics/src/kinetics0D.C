@@ -80,7 +80,7 @@ namespace GRINS
 
 
   template<typename Mixture, typename Evaluator>
-  void Kinetics0D<Mixture,Evaluator>::nonlocal_time_derivative
+  void Kinetics0D<Mixture,Evaluator>::element_time_derivative
   ( bool compute_jacobian, AssemblyContext & context )
   {
 
@@ -157,16 +157,21 @@ namespace GRINS
     for (unsigned int qp = 0; qp != n_qpoints; ++qp)
       {
 
+        libMesh::Real T = context.interior_value(this->_temp_vars.T(), qp);
+
+        libMesh::out <<"temp... " << T  << std::endl;
+
+
         mass_fractions[qp].resize(this->_n_species);
         h_s[qp].resize(this->_n_species);
         omega_dot_s[qp].resize(this->_n_species);
 
         libMesh::out <<"omega dot_s size " <<omega_dot_s[qp].size()  << std::endl;
 
-        gas_evaluator.omega_dot( T[qp], rho[qp], mass_fractions[qp], omega_dot_s[qp] );
+        gas_evaluator.omega_dot( T, rho[qp], mass_fractions[qp], omega_dot_s[qp] );
 
 
-        libMesh::Real T = context.interior_value(this->_temp_vars.T(), qp);
+
         libMesh::Real T_dot;
         context.interior_rate(this->_temp_vars.T(), qp, T_dot);
 
@@ -229,8 +234,6 @@ if( compute_jacobian )
                                      (*this),
                                      _p0 );
 
-    // why isnt this read in during construction of _species_vars/_n_species initilizer list
-    _n_species = 3;
   }
 
   template<typename Mixture, typename Evaluator>

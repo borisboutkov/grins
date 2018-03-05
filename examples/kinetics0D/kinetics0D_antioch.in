@@ -28,23 +28,34 @@
 
 # Mesh related options
 [Mesh]
-#   [./Read]
-#   filename = './zeroD.xda'
   [./Generation]
   dimension = '0'
-
 []
 
 [Materials]
   [./OzoneGas]
-    [./ThermodynamicPressure]
-      value = '1e5' #[Pa]
-    [../GasMixture]
-        thermochemistry_library = 'cantera'
+     [./ThermodynamicPressure]
+        value = '1e5' #[Pa]
+     [../GasMixture]
+        thermochemistry_library = 'antioch'
         species = 'O O2 O3'
         kinetics_data = 'ozone.xml'
-        [./Cantera]
-           gas_mixture = 'ozone'
+
+        [./Antioch]
+           transport_model = 'constant'
+           thermo_model = 'cea'
+           viscosity_model = 'constant'
+           thermal_conductivity_model = 'constant'
+           mass_diffusivity_model = 'constant_lewis'
+           cea_data = 'ozone_cea_data.dat'
+           species_data = 'ozone_species_data.dat'
+
+     [../../Viscosity]
+        value = '1.0e-5'
+     [../ThermalConductivity]
+        value = '0.02'
+     [../LewisNumber]
+        value = '1.0'
 []
 
 [Variables]
@@ -86,7 +97,7 @@
 # Options for print info to the screen
 [screen-options]
 
-   system_name = 'kinetics_0D'
+   system_name = 'kinetics0D'
 
    print_equation_system_info = 'true'
    print_mesh_info = 'true'

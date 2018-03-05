@@ -1,0 +1,96 @@
+
+# Solver Options
+[SolverOptions]
+   [./TimeStepping]
+      solver_type = 'libmesh_euler_solver'
+      delta_t = '1.0e-3'
+      n_timesteps = '5'
+      theta = '0.5'
+[]
+
+# Enabled Physics classes
+[Physics]
+   enabled_physics = 'Kinetics0D'
+   [./Kinetics0D]
+    material = 'OzoneGas'
+
+   # Initial Conditions
+    ic_ids = '0'
+    ic_types = 'parsed'
+    ic_variables = 'Y_O2:Y_O3:T'
+    ic_values = '{0.8}{0.2}{212}'
+
+    # specify this else : ERROR: Could not find required input parameter Physics/ReactingLowMachNavierStokes/material!
+   [../ReactingLowMachNavierStokes]
+         material = 'OzoneGas'
+
+[]
+
+# Mesh related options
+[Mesh]
+  [./Generation]
+  dimension = '0'
+
+[]
+
+[Materials]
+  [./OzoneGas]
+    [./ThermodynamicPressure]
+      value = '1e5' #[Pa]
+    [../GasMixture]
+    thermochemistry_library = 'cantera'
+        species = 'O O2 O3'
+        kinetics_data = 'ozone.xml'
+        [./Cantera]
+          gas_mixture = 'ozone'
+          []
+
+[Variables]
+  [./ScalarVariable]
+      names = 'dummyscalar'
+      order = 'FIRST'
+  [../Temperature]
+      names = 'T'
+      fe_family = 'LAGRANGE'
+      order = 'FIRST'
+
+  [../SpeciesMassFractions]
+      names = 'Y_'
+      fe_family = 'LAGRANGE'
+      order = 'FIRST'
+      material = 'OzoneGas'
+[]
+
+#Linear and nonlinear solver options
+[linear-nonlinear-solver]
+   continue_after_max_iterations = 'true'
+   max_nonlinear_iterations = '200'
+   max_linear_iterations = '2500'
+
+   use_numerical_jacobians_only = 'true'
+
+   relative_residual_tolerance = '1.0e-10'
+   relative_step_tolerance = '1.0e-6'
+[]
+
+# Visualization options
+[vis-options]
+   output_vis = 'false'
+   vis_output_file_prefix = 'output'
+   output_residual = 'false'
+   output_format = 'ExodusII xdr'
+[]
+
+# Options for print info to the screen
+[screen-options]
+
+   system_name = 'kinetics0D'
+
+   print_equation_system_info = 'true'
+   print_mesh_info = 'true'
+   print_log_info = 'true'
+   solver_verbose = 'true'
+   solver_quiet = 'false'
+
+   print_element_jacobians = 'false'
+[]
