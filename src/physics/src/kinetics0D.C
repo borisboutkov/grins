@@ -248,5 +248,33 @@ if( compute_jacobian )
     return _p0;
   }
 
+  template<typename Mixture, typename Evaluator>
+  void Kinetics0D<Mixture,Evaluator>::nonlocal_time_derivative
+  ( bool compute_jacobian, AssemblyContext & context )
+  {
+    // do nothing.
+    // satisfies pointer lookup for GRINS::ScalarODE::nonlocal_time_derivative  at ../../../source/src/physics/src/scalar_ode.C:115
+    // GRINS::MultiphysicsSystem::_general_residual at  ../../../source/src/physics/src/multiphysics_sys.C:317
+  }
+
+  template<typename Mixture, typename Evaluator>
+  void Kinetics0D<Mixture,Evaluator>::nonlocal_mass_residual
+  ( bool compute_jacobian, AssemblyContext & context )
+  {
+    // do nothing.
+    // satisfies pointer lookup for GRINS::ScalarODE::nonlocal_time_derivative  at ../../../source/src/physics/src/scalar_ode.C:115
+    // GRINS::MultiphysicsSystem::_general_residual at  ../../../source/src/physics/src/multiphysics_sys.C:317
+  }
+
+  template<typename Mixture, typename Evaluator>
+  void Kinetics0D<Mixture,Evaluator>::nonlocal_constraint
+  ( bool compute_jacobian, AssemblyContext & context )
+  {
+    // do nothing.
+    // satisfies pointer lookup for GRINS::ScalarODE::nonlocal_time_derivative  at ../../../source/src/physics/src/scalar_ode.C:115
+    // GRINS::MultiphysicsSystem::_general_residual at  ../../../source/src/physics/src/multiphysics_sys.C:317
+  }
+
+
 
 } // namespace GRINS
