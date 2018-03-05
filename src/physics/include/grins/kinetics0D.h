@@ -72,6 +72,13 @@ namespace GRINS
 
   protected:
 
+
+    PrimitiveTempFEVariables& _temp_vars;
+
+    SpeciesMassFractionsVariable & _species_vars;
+
+    std::unique_ptr<Mixture> _gas_mixture;
+
     //! Index from registering this quantity
     unsigned int _n_species;
 
@@ -105,11 +112,6 @@ namespace GRINS
     // Thermodynamic pressure (assumed constant)
     libMesh::Number _p0;
 
-    PrimitiveTempFEVariables& _temp_vars;
-
-    SpeciesMassFractionsVariable & _species_vars;
-
-    std::unique_ptr<Mixture> _gas_mixture;
 
   private:
 
