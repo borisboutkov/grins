@@ -26,13 +26,14 @@
 #ifndef GRINS_KINETICS0D_H
 #define GRINS_KINETICS0D_H
 
-#include "grins/scalar_ode.h"
+#include "grins/physics.h"
+#include "grins/single_variable.h"
 #include "grins/multicomponent_variable.h"
 
 namespace GRINS
 {
   template < typename Mixture, typename Evaluator >
-    class Kinetics0D : public ScalarODE  {
+    class Kinetics0D : public Physics  {
 
   public:
 
@@ -48,15 +49,6 @@ namespace GRINS
 
     // Time dependent part(s)
     virtual void element_time_derivative( bool compute_jacobian,
-                                          AssemblyContext & context );
-
-    virtual void nonlocal_time_derivative( bool compute_jacobian,
-                                          AssemblyContext & context );
-
-    virtual void nonlocal_mass_residual( bool compute_jacobian,
-                                          AssemblyContext & context );
-
-    virtual void nonlocal_constraint( bool compute_jacobian,
                                           AssemblyContext & context );
 
     // Sets temp variables to be time-evolving

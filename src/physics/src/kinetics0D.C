@@ -45,7 +45,7 @@ namespace GRINS
   Kinetics0D <Mixture,Evaluator>::Kinetics0D(const PhysicsName& physics_name,
                                             const GetPot& input,
                                             std::unique_ptr<Mixture> & gas_mix)
-    : ScalarODE(physics_name,input),
+    : Physics(physics_name,input),
       _temp_vars(GRINSPrivate::VariableWarehouse::get_variable_subclass<PrimitiveTempFEVariables>(VariablesParsing::temp_variable_name(input,physics_name,VariablesParsing::PHYSICS))),
       _species_vars(GRINSPrivate::VariableWarehouse::get_variable_subclass<SpeciesMassFractionsVariable>(VariablesParsing::species_mass_frac_variable_name(input,physics_name,VariablesParsing::PHYSICS))),
       _gas_mixture(gas_mix.release()),
@@ -86,10 +86,6 @@ namespace GRINS
 
     // Our gas evaluator
     Evaluator gas_evaluator( *(this->_gas_mixture) );
-
-    // Appease unsed variables rules
-    const VariableIndex dummyscalar_var = this->scalar_ode_var();
-    const std::vector<std::vector<libMesh::Number> > & dummyval  = context.get_element_fe(dummyscalar_var)->get_phi();
 
     // The subvectors and submatrices we need to fill:
     libMesh::DenseSubVector<libMesh::Number> &F_T = context.get_elem_residual(this->_temp_vars.T()); // R_{T}
@@ -247,34 +243,5 @@ if( compute_jacobian )
   {
     return _p0;
   }
-
-  template<typename Mixture, typename Evaluator>
-  void Kinetics0D<Mixture,Evaluator>::nonlocal_time_derivative
-  ( bool compute_jacobian, AssemblyContext & context )
-  {
-    // do nothing.
-    // satisfies pointer lookup for GRINS::ScalarODE::nonlocal_time_derivative  at ../../../source/src/physics/src/scalar_ode.C:115
-    // GRINS::MultiphysicsSystem::_general_residual at  ../../../source/src/physics/src/multiphysics_sys.C:317
-  }
-
-  template<typename Mixture, typename Evaluator>
-  void Kinetics0D<Mixture,Evaluator>::nonlocal_mass_residual
-  ( bool compute_jacobian, AssemblyContext & context )
-  {
-    // do nothing.
-    // satisfies pointer lookup for GRINS::ScalarODE::nonlocal_time_derivative  at ../../../source/src/physics/src/scalar_ode.C:115
-    // GRINS::MultiphysicsSystem::_general_residual at  ../../../source/src/physics/src/multiphysics_sys.C:317
-  }
-
-  template<typename Mixture, typename Evaluator>
-  void Kinetics0D<Mixture,Evaluator>::nonlocal_constraint
-  ( bool compute_jacobian, AssemblyContext & context )
-  {
-    // do nothing.
-    // satisfies pointer lookup for GRINS::ScalarODE::nonlocal_time_derivative  at ../../../source/src/physics/src/scalar_ode.C:115
-    // GRINS::MultiphysicsSystem::_general_residual at  ../../../source/src/physics/src/multiphysics_sys.C:317
-  }
-
-
 
 } // namespace GRINS
