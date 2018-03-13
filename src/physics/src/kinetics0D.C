@@ -49,12 +49,12 @@ namespace GRINS
       _temp_vars(GRINSPrivate::VariableWarehouse::get_variable_subclass<PrimitiveTempFEVariables>(VariablesParsing::temp_variable_name(input,physics_name,VariablesParsing::PHYSICS))),
       _species_vars(GRINSPrivate::VariableWarehouse::get_variable_subclass<SpeciesMassFractionsVariable>(VariablesParsing::species_mass_frac_variable_name(input,physics_name,VariablesParsing::PHYSICS))),
       _gas_mixture(gas_mix.release()),
+      _n_species(_species_vars.n_species()),
       _rho_index(0),
       _mu_index(0),
       _k_index(0),
-      _n_species(_species_vars.n_species()),
-      _p0(0),
-      _cp_index(0)
+      _cp_index(0),
+      _p0(0)
   {
     this->_ic_handler = new GenericICHandler( physics_name, input );
     this->read_input_options(input);
@@ -110,10 +110,6 @@ namespace GRINS
     std::vector<libMesh::Real> R;
     R.resize(n_qpoints);
 
-    // density
-    std::vector<libMesh::Real> rho;
-    rho.resize(n_qpoints);
-
     // specific heat
     std::vector<libMesh::Real> cp;
     cp.resize(n_qpoints);
@@ -133,30 +129,25 @@ namespace GRINS
     const unsigned int n_T_dofs = context.get_dof_indices(this->_temp_vars.T()).size();
     const unsigned int n_s_dofs = context.get_dof_indices(s0_var).size();
 
-    libMesh::out << "num  tdofs = " << n_T_dofs << std::endl;
-    libMesh::out << "num  sdofs = " << n_s_dofs << std::endl;
-
-    // The temperature shape functions at interior quadrature points.
+// The temperature shape functions at interior quadrature points.
     const std::vector<std::vector<libMesh::Real> >& T_phi =
       context.get_element_fe(this->_temp_vars.T())->get_phi();
 
-    // The temperature shape functions gradients at interior quadrature points.
-    const std::vector<std::vector<libMesh::RealGradient> >& T_gradphi =
-      context.get_element_fe(this->_temp_vars.T())->get_dphi();
-
-    // The species shape functions at interior quadrature points.
+// The species shape functions at interior quadrature points.
     const std::vector<std::vector<libMesh::Real> >& s_phi =
       context.get_element_fe(s0_var)->get_phi();
 
-    libMesh::out << "assemble... " << std::endl;
     // Assemble Residuals
+    libMesh::out << "assemble... " << std::endl;
     for (unsigned int qp = 0; qp != n_qpoints; ++qp)
       {
 
         libMesh::Real T = context.interior_value(this->_temp_vars.T(), qp);
+        libMesh::Real Tdot;
+        context.interior_rate(this->_temp_vars.T(), qp, Tdot);
 
         libMesh::out <<"temp... " << T  << std::endl;
-
+        libMesh::out <<"temp dot... " << Tdot  << std::endl;
 
         mass_fractions[qp].resize(this->_n_species);
         h_s[qp].resize(this->_n_species);
@@ -164,48 +155,62 @@ namespace GRINS
 
         libMesh::out <<"omega dot_s size " <<omega_dot_s[qp].size()  << std::endl;
 
-        gas_evaluator.omega_dot( T, rho[qp], mass_fractions[qp], omega_dot_s[qp] );
-
-
-
-        libMesh::Real T_dot;
-        context.interior_rate(this->_temp_vars.T(), qp, T_dot);
+        gas_evaluator.omega_dot( T, _p0, mass_fractions[qp], omega_dot_s[qp] );
 
         libMesh::Real hwsum = 0;
         libMesh::Real xcsum = 0;
+        libMesh::Real xsum = 0;
+        libMesh::Real wdotsum = 0;
 
         for( unsigned int s = 0; s < this->_n_species; s++ )
           {
             // ensure species dont go slightly negative
             mass_fractions[qp][s] = std::max( 0.0, context.interior_value( this->_species_vars.species(s),qp ));
             h_s[qp][s] = gas_evaluator.h_s( T, s );
-            cp[qp] = gas_evaluator.cp(T, 0/*p0[qp]*/, mass_fractions[qp]);
+            cp[qp] = gas_evaluator.cp(T, _p0, mass_fractions[qp]);
 
+            xsum += mass_fractions[qp][s];
             xcsum += mass_fractions[qp][s]*cp[qp];
+
+            wdotsum += omega_dot_s[qp][s];
             hwsum += h_s[qp][s]*omega_dot_s[qp][s];
+
           }
 
         M[qp] = gas_evaluator.M_mix( mass_fractions[qp] );
         R[qp] = gas_evaluator.R_mix( mass_fractions[qp] );
-        const libMesh::Real p0 = this->_p0;
+
+        // just gives back _p0
+        this->rho( T, this->_p0, R[qp] );
+
+        libMesh::out << "mass_frac: " <<mass_fractions[qp][0] << " "
+                     << mass_fractions[qp][1] << " "  << mass_fractions[qp][2] << " "  << std::endl;
+
+        libMesh::out <<"omega dot " << omega_dot_s[qp][0] << " " <<  omega_dot_s[qp][1] << " " <<
+                     omega_dot_s[qp][2] << " " <<std::endl;
 
         // Temperature residual
         for (unsigned int i = 0; i != n_T_dofs; ++i)
-          F_T(i) -= (hwsum/xcsum) * T_phi[qp][0];
-
-        // Species residual
-        for(unsigned int s=0; s < this->n_species(); s++)
           {
-            libMesh::DenseSubVector<libMesh::Number> &F_s =
-              context.get_elem_residual(this->_species_vars.species(s)); //R_{s}
-
-            // only
-            for (unsigned int i = 0; i != n_s_dofs; ++i)
-              F_s(i) -=omega_dot_s[i][qp]*s_phi[i][qp];
+            F_T(i) -= (hwsum/xcsum) * T_phi[qp][0];
+            libMesh::out<< "hws: " << hwsum << std::endl;
+            libMesh::out<< "xcs: " << xcsum << std::endl;
+            libMesh::out<< "phi: " << T_phi[qp][0] << std::endl;
+            libMesh::out<< "F_T(i): " << F_T(i) << std::endl;
 
           }
 
+        // Species residual
+        for(unsigned int s=0; s < this->_n_species; s++)
+          {
+            libMesh::DenseSubVector<libMesh::Number> &F_s =
+              context.get_elem_residual(this->_species_vars.species(s));
 
+            // only
+            for (unsigned int i = 0; i != n_s_dofs; ++i)
+              F_s(i) = omega_dot_s[i][qp]*s_phi[i][qp]
+                - (mass_fractions[qp][s] * (wdotsum/xsum + 1/T * Tdot ) )*s_phi[i][qp];
+          }
       }
 
 if( compute_jacobian )
@@ -226,21 +231,29 @@ if( compute_jacobian )
     // Read thermodynamic pressure info
     MaterialsParsing::read_property( input,
                                      "ThermodynamicPressure",
-                                     PhysicsNaming::reacting_low_mach_navier_stokes(),
+                                     PhysicsNaming::kinetics0D(),
                                      (*this),
                                      _p0 );
-
   }
 
   template<typename Mixture, typename Evaluator>
   void Kinetics0D<Mixture,Evaluator>::set_time_evolving_vars( libMesh::FEMSystem * system )
   {
-    // do something?
-  }
+    // Tell the system to march temperature forward in time
+    system->time_evolving(_temp_vars.T(), 1);
+
+    // And also each of the involved species
+    for( unsigned int i = 0; i < this->_n_species; i++ )
+      {
+        system->time_evolving( _species_vars.species(i), 1 );
+      }
+}
 
   template<typename Mixture, typename Evaluator>
   libMesh::Real Kinetics0D<Mixture,Evaluator>::rho( libMesh::Real T, libMesh::Real p0, libMesh::Real R_mix)
   {
+    libMesh::out << "using t, p0, R_mix: " << T <<" "<< p0<< " " << R_mix << std::endl;
+
     return _p0;
   }
 

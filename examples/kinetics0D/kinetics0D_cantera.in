@@ -20,11 +20,7 @@
     ic_variables = 'Y_O2:Y_O3:T'
     ic_values = '{0.8}{0.2}{212}'
 
-    # specify this else : ERROR: Could not find required input parameter Physics/ReactingLowMachNavierStokes/material!
-   [../ReactingLowMachNavierStokes]
-         material = 'OzoneGas'
-
-[]
+ []
 
 # Mesh related options
 [Mesh]
@@ -46,10 +42,7 @@
           []
 
 [Variables]
-  [./ScalarVariable]
-      names = 'dummyscalar'
-      order = 'FIRST'
-  [../Temperature]
+  [./Temperature]
       names = 'T'
       fe_family = 'LAGRANGE'
       order = 'FIRST'
