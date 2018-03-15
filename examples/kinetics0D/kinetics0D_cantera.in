@@ -18,7 +18,7 @@
     ic_ids = '0'
     ic_types = 'parsed'
     ic_variables = 'Y_O2:Y_O3:T'
-    ic_values = '{0.8}{0.2}{212}'
+    ic_values = '{0.8}{0.2}{912}'
 
  []
 

@@ -208,8 +208,11 @@ namespace GRINS
 
             // only
             for (unsigned int i = 0; i != n_s_dofs; ++i)
-              F_s(i) = omega_dot_s[i][qp]*s_phi[i][qp]
-                - (mass_fractions[qp][s] * (wdotsum/xsum + 1/T * Tdot ) )*s_phi[i][qp];
+              {
+                F_s(i) = omega_dot_s[i][qp]*s_phi[i][qp]
+                  - (mass_fractions[qp][s] * (wdotsum/xsum + 1/T * Tdot ) )*s_phi[i][qp];
+                libMesh::out<< "F_s(i): " << F_s(i) << std::endl;
+              }
           }
       }
 
