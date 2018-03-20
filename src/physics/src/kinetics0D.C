@@ -155,8 +155,6 @@ namespace GRINS
 
         libMesh::out <<"omega dot_s size " <<omega_dot_s[qp].size()  << std::endl;
 
-        gas_evaluator.omega_dot( T, _p0, mass_fractions[qp], omega_dot_s[qp] );
-
         libMesh::Real hwsum = 0;
         libMesh::Real xcsum = 0;
         libMesh::Real xsum = 0;
@@ -166,8 +164,11 @@ namespace GRINS
           {
             // ensure species dont go slightly negative
             mass_fractions[qp][s] = std::max( 0.0, context.interior_value( this->_species_vars.species(s),qp ));
+
+
             h_s[qp][s] = gas_evaluator.h_s( T, s );
             cp[qp] = gas_evaluator.cp(T, _p0, mass_fractions[qp]);
+            gas_evaluator.omega_dot( T, _p0, mass_fractions[qp], omega_dot_s[qp] );
 
             xsum += mass_fractions[qp][s];
             xcsum += mass_fractions[qp][s]*cp[qp];
