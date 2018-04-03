@@ -39,6 +39,7 @@
 #include "libmesh/tecplot_io.h"
 #include "libmesh/vtk_io.h"
 #include "libmesh/enum_xdr_mode.h"
+#include "libmesh/gnuplot_io.h"
 
 // POSIX
 #include <sys/errno.h>
@@ -242,6 +243,13 @@ namespace GRINS
             std::string filename = filename_prefix+"_mesh.xda";
             equation_system->get_mesh().write( filename );
           }
+        else if ((*format) == "GNUplot" )
+          {
+            std::string filename = filename_prefix+".output";
+            libMesh::GnuPlotIO plotter(mesh, filename);
+             plotter.write_equation_systems("gnuplot_script", *equation_system);
+          }
+
         else
           {
             // TODO: Do we want to use this to error throughout the code?
