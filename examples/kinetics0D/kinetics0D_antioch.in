@@ -4,8 +4,8 @@
    [./TimeStepping]
       solver_type = 'libmesh_euler_solver'
       #delta_t = '1.0e-3'
-      delta_t = '0.2'
-      n_timesteps = '1'
+      delta_t = '1.0e-6'
+      n_timesteps = '5'
       theta = '0.5'
 []
 
