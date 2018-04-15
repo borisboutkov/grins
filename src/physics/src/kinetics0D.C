@@ -92,8 +92,9 @@ namespace GRINS
 
     // Will be 1 since we are dealing with a 0 dimensional problem in space
     unsigned int n_qpoints = context.get_element_qrule().n_points();
-    libMesh::out << "num  quadpoints = " << n_qpoints << std::endl;
-    libMesh::out << "num  species = " << _n_species << std::endl;
+
+    //libMesh::out << "num  quadpoints = " << n_qpoints << std::endl;
+    //libMesh::out << "num  species = " << _n_species << std::endl;
 
     // Temperature
     std::vector<libMesh::Real> T;
@@ -138,7 +139,7 @@ namespace GRINS
       context.get_element_fe(s0_var)->get_phi();
 
     // Assemble Residuals
-    libMesh::out << "assemble... " << std::endl;
+    //libMesh::out << "assemble... " << std::endl;
     for (unsigned int qp = 0; qp != n_qpoints; ++qp)
       {
 
@@ -146,14 +147,13 @@ namespace GRINS
         libMesh::Real Tdot;
         context.interior_rate(this->_temp_vars.T(), qp, Tdot);
 
-        libMesh::out <<"temp... " << T  << std::endl;
         libMesh::out <<"temp dot... " << Tdot  << std::endl;
+
+        libmesh_assert_greater(T,0);
 
         mass_fractions[qp].resize(this->_n_species);
         h_s[qp].resize(this->_n_species);
         omega_dot_s[qp].resize(this->_n_species);
-
-        libMesh::out <<"omega dot_s size " <<omega_dot_s[qp].size()  << std::endl;
 
         libMesh::Real hwsum = 0;
         libMesh::Real xcsum = 0;
@@ -194,11 +194,11 @@ namespace GRINS
         for (unsigned int i = 0; i != n_T_dofs; ++i)
           {
             F_T(i) -= (hwsum/xcsum) * T_phi[qp][0];
-            libMesh::out<< "hws: " << hwsum << std::endl;
-            libMesh::out<< "xcs: " << xcsum << std::endl;
-            libMesh::out<< "phi: " << T_phi[qp][0] << std::endl;
-            libMesh::out<< "F_T(i): " << F_T(i) << std::endl;
 
+            //libMesh::out<< "hws: " << hwsum << std::endl;
+            //libMesh::out<< "xcs: " << xcsum << std::endl;
+            //libMesh::out<< "phi: " << T_phi[qp][0] << std::endl;
+            //libMesh::out<< "F_T(i): " << F_T(i) << std::endl;
           }
 
         // Species residual
@@ -212,7 +212,7 @@ namespace GRINS
               {
                 F_s(i) = omega_dot_s[i][qp]*s_phi[i][qp]
                   - (mass_fractions[qp][s] * (wdotsum/xsum + 1/T * Tdot ) )*s_phi[i][qp];
-                libMesh::out<< "F_s(i): " << F_s(i) << std::endl;
+                //libMesh::out<< "F_s(i): " << F_s(i) << std::endl;
               }
           }
       }

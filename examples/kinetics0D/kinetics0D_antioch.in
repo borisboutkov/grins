@@ -3,8 +3,7 @@
 [SolverOptions]
    [./TimeStepping]
       solver_type = 'libmesh_euler_solver'
-      #delta_t = '1.0e-3'
-      delta_t = '1.0e-6'
+      delta_t = '1.0e-7'
       n_timesteps = '5'
       theta = '0.5'
 []
@@ -18,8 +17,8 @@
    # Initial Conditions
     ic_ids = '0'
     ic_types = 'parsed'
-    ic_variables = 'Y_O2:Y_O3:T'
-    ic_values = '{0.8}{0.2}{912}'
+    ic_variables = 'Y_O:Y_O2:Y_O3:T'
+    ic_values = '{0.1}{0.7}{0.2}{912}'
 
 []
 
