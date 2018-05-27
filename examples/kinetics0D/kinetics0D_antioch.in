@@ -3,9 +3,9 @@
 [SolverOptions]
    [./TimeStepping]
       solver_type = 'libmesh_euler_solver'
-      delta_t = '1.0e-7'
-      n_timesteps = '5'
-      theta = '0.5'
+      delta_t = '1.0e-8'
+      n_timesteps = '1'
+      theta = '0.2'
 []
 
 # Enabled Physics classes
@@ -52,6 +52,11 @@
         value = '0.02'
      [../LewisNumber]
         value = '1.0'
+[]
+
+[BoundaryConditions]
+   bc_ids = ''
+   bc_id_name_map = ''
 []
 
 [Variables]
