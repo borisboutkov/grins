@@ -67,10 +67,6 @@ namespace GRINS
     void mass_fractions( const libMesh::Point& p, const AssemblyContext& c,
                          std::vector<libMesh::Real>& mass_fracs ) const;
 
-    // Evaluate rho
-    libMesh::Real rho ( libMesh::Real T, libMesh::Real p0, libMesh::Real R_mix);
-
-
   protected:
 
 
@@ -82,9 +78,6 @@ namespace GRINS
 
     //! Index from registering this quantity
     unsigned int _n_species;
-
-    //! Index from registering this quantity
-    unsigned int _rho_index;
 
     //! Index from registering this quantity. Each species will have it's own index.
     std::vector<unsigned int> _species_viscosity;

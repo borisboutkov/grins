@@ -50,7 +50,6 @@ namespace GRINS
       _species_vars(GRINSPrivate::VariableWarehouse::get_variable_subclass<SpeciesMassFractionsVariable>(VariablesParsing::species_mass_frac_variable_name(input,physics_name,VariablesParsing::PHYSICS))),
       _gas_mixture(gas_mix.release()),
       _n_species(_species_vars.n_species()),
-      _rho_index(0),
       _mu_index(0),
       _k_index(0),
       _cp_index(0),
@@ -84,7 +83,7 @@ namespace GRINS
   ( bool compute_jacobian, AssemblyContext & context )
   {
 
-    // Our gas evaluator
+    // Gas Evaluator
     Evaluator gas_evaluator( *(this->_gas_mixture) );
 
     // The subvectors and submatrices we need to fill:
@@ -93,13 +92,11 @@ namespace GRINS
     // Will be 1 since we are dealing with a 0 dimensional problem in space
     unsigned int n_qpoints = context.get_element_qrule().n_points();
 
-    //libMesh::out << "num  quadpoints = " << n_qpoints << std::endl;
-    //libMesh::out << "num  species = " << _n_species << std::endl;
-
     // Temperature
     std::vector<libMesh::Real> T;
     T.resize(n_qpoints);
 
+    // 2D vector even though n_qp = 1 to satisfy context.get_* needs
     std::vector< std::vector<libMesh::Real> > mass_fractions;
     mass_fractions.resize(n_qpoints);
 
@@ -111,15 +108,15 @@ namespace GRINS
     std::vector<libMesh::Real> R;
     R.resize(n_qpoints);
 
-    // specific heat
+    // Specific Heat
     std::vector<libMesh::Real> cp;
     cp.resize(n_qpoints);
 
-    // enthalpy
+    // Enthalpy
     std::vector<std::vector<libMesh::Real> > h_s;
     h_s.resize(n_qpoints);
 
-    // species production rates
+    // Species Production Rates
     std::vector<std::vector<libMesh::Real> > omega_dot_s;
     omega_dot_s.resize(n_qpoints);
 
@@ -139,7 +136,6 @@ namespace GRINS
       context.get_element_fe(s0_var)->get_phi();
 
     // Assemble Residuals
-    //libMesh::out << "assemble... " << std::endl;
     for (unsigned int qp = 0; qp != n_qpoints; ++qp)
       {
 
@@ -147,23 +143,27 @@ namespace GRINS
         libMesh::Real Tdot;
         context.interior_rate(this->_temp_vars.T(), qp, Tdot);
 
+        libMesh::out <<"temp ... " << T  << std::endl;
         //libMesh::out <<"temp dot... " << Tdot  << std::endl;
+
+        // Sanity check
         libmesh_assert_greater(T,0);
 
         mass_fractions[qp].resize(this->_n_species);
         h_s[qp].resize(this->_n_species);
         omega_dot_s[qp].resize(this->_n_species);
 
+        // Various summations needed for residual evaluations
         libMesh::Real hwsum = 0;
         libMesh::Real xcsum = 0;
         libMesh::Real xsum = 0;
         libMesh::Real wdotsum = 0;
 
+        // Pre-calculate above summations
         for( unsigned int s = 0; s < this->_n_species; s++ )
           {
-            // ensure species dont go slightly negative
+            // Ensure species dont overshoot to negative values
             mass_fractions[qp][s] = std::max( 0.0, context.interior_value( this->_species_vars.species(s),qp ));
-
 
             h_s[qp][s] = gas_evaluator.h_s( T, s );
             cp[qp] = gas_evaluator.cp(T, _p0, mass_fractions[qp]);
@@ -180,9 +180,6 @@ namespace GRINS
         M[qp] = gas_evaluator.M_mix( mass_fractions[qp] );
         R[qp] = gas_evaluator.R_mix( mass_fractions[qp] );
 
-        // just gives back _p0
-        this->rho( T, this->_p0, R[qp] );
-
         libMesh::out << "mass_frac: " <<mass_fractions[qp][0] << " "
                      << mass_fractions[qp][1] << " "  << mass_fractions[qp][2] << " "  << std::endl;
 
@@ -192,26 +189,26 @@ namespace GRINS
         // Temperature residual
         for (unsigned int i = 0; i != n_T_dofs; ++i)
           {
-            F_T(i) -= (hwsum/xcsum) * T_phi[qp][0];
+            F_T(i) += -(hwsum/xcsum) * T_phi[qp][0];
 
-            //libMesh::out<< "hws: " << hwsum << std::endl;
-            //libMesh::out<< "xcs: " << xcsum << std::endl;
-            //libMesh::out<< "phi: " << T_phi[qp][0] << std::endl;
-            //libMesh::out<< "F_T(i): " << F_T(i) << std::endl;
+            libMesh::out<< "hws: " << hwsum << std::endl;
+            libMesh::out<< "xcs: " << xcsum << std::endl;
+            //libMesh::out<< "Tphi: " << T_phi[qp][0] << std::endl; == 1
+            libMesh::out<< "F_T(i): " << F_T(i) << std::endl;
           }
 
-        // Species residual
+        // Species residuals
         for(unsigned int s=0; s < this->_n_species; s++)
           {
             libMesh::DenseSubVector<libMesh::Number> &F_s =
               context.get_elem_residual(this->_species_vars.species(s));
 
-            // only
             for (unsigned int i = 0; i != n_s_dofs; ++i)
               {
-                F_s(i) = + omega_dot_s[i][qp]*s_phi[i][qp]
-                  - (mass_fractions[qp][s] * (wdotsum/xsum + 1/T * Tdot ) )*s_phi[i][qp];
+                F_s(i) +=  omega_dot_s[qp][s]*s_phi[i][qp]
+                  - (mass_fractions[qp][s] * (wdotsum/xsum +  Tdot/T ) )*s_phi[i][qp];
                 //libMesh::out<< "F_s(i): " << F_s(i) << std::endl;
+                //libMesh::out<< "s_phi: " << s_phi[i][qp] << std::endl; == 1
               }
           }
       }
@@ -251,12 +248,5 @@ if( compute_jacobian )
       }
 }
 
-  template<typename Mixture, typename Evaluator>
-  libMesh::Real Kinetics0D<Mixture,Evaluator>::rho( libMesh::Real T, libMesh::Real p0, libMesh::Real R_mix)
-  {
-    //libMesh::out << "using t, p0, R_mix: " << T <<" "<< p0<< " " << R_mix << std::endl;
-
-    return _p0;
-  }
 
 } // namespace GRINS
