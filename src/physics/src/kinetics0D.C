@@ -54,7 +54,7 @@ namespace GRINS
       _mu_index(0),
       _k_index(0),
       _cp_index(0),
-      _p0(0)
+      _p0(10000)
   {
     this->_ic_handler = new GenericICHandler( physics_name, input );
     this->read_input_options(input);
@@ -100,7 +100,7 @@ namespace GRINS
     std::vector<libMesh::Real> T;
     T.resize(n_qpoints);
 
-    std::vector<std::vector<libMesh::Real> > mass_fractions;
+    std::vector< std::vector<libMesh::Real> > mass_fractions;
     mass_fractions.resize(n_qpoints);
 
     // Molecular weight of species (kg/kmol)
@@ -130,11 +130,11 @@ namespace GRINS
     const unsigned int n_T_dofs = context.get_dof_indices(this->_temp_vars.T()).size();
     const unsigned int n_s_dofs = context.get_dof_indices(s0_var).size();
 
-// The temperature shape functions at interior quadrature points.
+    // The temperature shape functions at interior quadrature points.
     const std::vector<std::vector<libMesh::Real> >& T_phi =
       context.get_element_fe(this->_temp_vars.T())->get_phi();
 
-// The species shape functions at interior quadrature points.
+    // The species shape functions at interior quadrature points.
     const std::vector<std::vector<libMesh::Real> >& s_phi =
       context.get_element_fe(s0_var)->get_phi();
 
@@ -147,8 +147,7 @@ namespace GRINS
         libMesh::Real Tdot;
         context.interior_rate(this->_temp_vars.T(), qp, Tdot);
 
-        libMesh::out <<"temp dot... " << Tdot  << std::endl;
-
+        //libMesh::out <<"temp dot... " << Tdot  << std::endl;
         libmesh_assert_greater(T,0);
 
         mass_fractions[qp].resize(this->_n_species);
@@ -188,7 +187,7 @@ namespace GRINS
                      << mass_fractions[qp][1] << " "  << mass_fractions[qp][2] << " "  << std::endl;
 
         libMesh::out <<"omega dot " << omega_dot_s[qp][0] << " " <<  omega_dot_s[qp][1] << " " <<
-                     omega_dot_s[qp][2] << " " <<std::endl;
+          omega_dot_s[qp][2] << " " <<std::endl;
 
         // Temperature residual
         for (unsigned int i = 0; i != n_T_dofs; ++i)
@@ -210,7 +209,7 @@ namespace GRINS
             // only
             for (unsigned int i = 0; i != n_s_dofs; ++i)
               {
-                F_s(i) = omega_dot_s[i][qp]*s_phi[i][qp]
+                F_s(i) = + omega_dot_s[i][qp]*s_phi[i][qp]
                   - (mass_fractions[qp][s] * (wdotsum/xsum + 1/T * Tdot ) )*s_phi[i][qp];
                 //libMesh::out<< "F_s(i): " << F_s(i) << std::endl;
               }
@@ -219,8 +218,7 @@ namespace GRINS
 
 if( compute_jacobian )
       libmesh_not_implemented();
-
-  } // end nonlocal_time_derivative
+  } // end element_time_derivative
 
 
   template<typename Mixture, typename Evaluator>
@@ -256,7 +254,7 @@ if( compute_jacobian )
   template<typename Mixture, typename Evaluator>
   libMesh::Real Kinetics0D<Mixture,Evaluator>::rho( libMesh::Real T, libMesh::Real p0, libMesh::Real R_mix)
   {
-    libMesh::out << "using t, p0, R_mix: " << T <<" "<< p0<< " " << R_mix << std::endl;
+    //libMesh::out << "using t, p0, R_mix: " << T <<" "<< p0<< " " << R_mix << std::endl;
 
     return _p0;
   }
