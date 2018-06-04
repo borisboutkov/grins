@@ -54,23 +54,18 @@ namespace GRINS
     // Sets temp variables to be time-evolving
     virtual void set_time_evolving_vars( libMesh::FEMSystem* system );
 
-    // Returns how many species are we working with
+    // Returns how many species are defined for this problem
     unsigned int n_species() const;
 
     // Function to evaluate gas mixture properties
     const Mixture & gas_mixture() const;
 
-    // Evaluate the temp
-    libMesh::Real T( const libMesh::Point& p, const AssemblyContext& c ) const;
-
-    // Evaluate mass fractions
-    void mass_fractions( const libMesh::Point& p, const AssemblyContext& c,
-                         std::vector<libMesh::Real>& mass_fracs ) const;
+    // Evaluate rho
+    libMesh::Real rho ( libMesh::Real T, libMesh::Real p0, libMesh::Real R_mix);
 
   protected:
 
-
-    PrimitiveTempFEVariables& _temp_vars;
+    PrimitiveTempFEVariables & _temp_vars;
 
     SpeciesMassFractionsVariable & _species_vars;
 

@@ -127,9 +127,9 @@ namespace GRINS
     // Convenience
     const VariableIndex s0_var = this->_species_vars.species(0);
 
-    // The number of local degrees of freedom in each variable. (both = 1)
+    // The number of local degrees of freedom in each variable. (both = 1 since we have 0 dimensional kinetics)
     const unsigned int n_T_dofs = context.get_dof_indices(this->_temp_vars.T()).size();
-    const unsigned int n_s_dofs = context.get_dof_indices(s0_var).size();
+    //const unsigned int n_s_dofs = context.get_dof_indices(s0_var).size();
 
     // The temperature shape functions at interior quadrature points.
     const std::vector<std::vector<libMesh::Real> >& T_phi =
@@ -158,6 +158,7 @@ namespace GRINS
         // Various summations needed for residual evaluations
         libMesh::Real hwsum = 0,xcsum = 0,xsum = 0,wdotsum = 0, massfrac_sum = 0;
 
+
         // Pre-calculate above summations
         for( unsigned int s = 0; s < this->_n_species; s++ )
           {
@@ -168,7 +169,6 @@ namespace GRINS
 
             h_s[qp][s] = gas_evaluator.h_s( T, s );
             cp[qp] = gas_evaluator.cp(T, _p0, mass_fractions[qp]);
-            gas_evaluator.omega_dot( T, 1, mass_fractions[qp], omega_dot_s[qp] );
 
             xsum += mole_fractions[qp][s];
             xcsum += mole_fractions[qp][s]*cp[qp];
@@ -181,6 +181,11 @@ namespace GRINS
 
         M[qp] = gas_evaluator.M_mix( mass_fractions[qp] );
         R[qp] = gas_evaluator.R_mix( mass_fractions[qp] );
+
+        libMesh::Real rho = 0;
+        rho = this->rho(T, _p0, R[qp]);
+        gas_evaluator.omega_dot( T, rho, mass_fractions[qp], omega_dot_s[qp] );
+
 
         {
         libMesh::out <<"temp ... " << T  << std::endl;
@@ -265,7 +270,15 @@ if( compute_jacobian )
       {
         system->time_evolving( _species_vars.species(i), 1 );
       }
-}
+  }
+
+  template<typename Mixture, typename Evaluator>
+  libMesh::Real Kinetics0D<Mixture,Evaluator>::rho( libMesh::Real T, libMesh::Real p0, libMesh::Real R_mix)
+  {
+    // density evaluated using equation of state: P = rho*RT
+    //libMesh::out << "using t, p0, R_mix: " << T <<" "<< p0<< " " << R_mix << std::endl;
+    return  p0/(R_mix*T);
+  }
 
 
 } // namespace GRINS
