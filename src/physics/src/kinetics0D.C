@@ -173,6 +173,7 @@ namespace GRINS
         libMesh::Real rho = 0;
         rho = this->rho(T, _p0, mass_fractions[qp], molecular_mass[qp]);
         gas_evaluator.omega_dot( T, rho, mass_fractions[qp], omega_dot[qp] );
+
         R[qp] = gas_evaluator.R_mix( mass_fractions[qp] );
 
         //convert omega_dot from kg/(s*m^3) to mol/(s*m^3)
@@ -224,9 +225,7 @@ namespace GRINS
         libMesh::out<< "omega_dot sum: " << wdotsum << std::endl;
         }
 
-
         //libmesh_assert_greater(1e-2, 1-massfrac_sum);
-
 
         // Temperature residual
         for (unsigned int i = 0; i != n_T_dofs; ++i)
@@ -242,8 +241,7 @@ namespace GRINS
             // length 1
             libMesh::DenseSubVector<libMesh::Number> &F_s =
               context.get_elem_residual(this->_species_vars.species(s));
-
-            F_s(0) +=  ( (omega_dot[qp][s]) * molecular_mass[qp][s] / rho  )*s_phi[qp][0];
+            F_s(0) +=  ( (omega_dot[qp][s] * molecular_mass[qp][s]) / rho  )*s_phi[qp][0];
             libMesh::out<< "F_s(i): " << F_s(0) << std::endl;
             //libMesh::out<< "s_phi: " << s_phi[i][qp] << std::endl; == 1
 

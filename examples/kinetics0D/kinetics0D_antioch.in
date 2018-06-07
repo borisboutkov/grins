@@ -3,9 +3,26 @@
 [SolverOptions]
    [./TimeStepping]
       solver_type = 'libmesh_euler_solver'
-      delta_t = '1.0e-9'
+      delta_t = '1.0e-10'
       n_timesteps = '10'
       theta = '1'
+   []
+[]
+
+#Linear and nonlinear solver options
+[linear-nonlinear-solver]
+
+   continue_after_max_iterations = 'true'
+   max_nonlinear_iterations = '200'
+   max_linear_iterations = '2500'
+
+   minimum_linear_tolerance = '1.0e-6'
+
+   use_numerical_jacobians_only = 'true'
+
+  absolute_residual_tolerance = '1.0e-2'
+#  relative_residual_tolerance = '0'
+   relative_step_tolerance = '1.0e-8'
 []
 
 # Enabled Physics classes
@@ -18,7 +35,7 @@
     ic_ids = '0'
     ic_types = 'parsed'
     ic_variables = 'Y_O:Y_O2:Y_O3:T'
-    ic_values = '{0.1}{0.7}{0.2}{950}'
+    ic_values = '{0.4}{0.2}{0.4}{950}'
 
 []
 
@@ -70,18 +87,6 @@
       fe_family = 'LAGRANGE'
       order = 'FIRST'
       material = 'OzoneGas'
-[]
-
-#Linear and nonlinear solver options
-[linear-nonlinear-solver]
-   continue_after_max_iterations = 'true'
-   max_nonlinear_iterations = '200'
-   max_linear_iterations = '2500'
-
-   use_numerical_jacobians_only = 'true'
-
-   relative_residual_tolerance = '1.0e-10'
-   relative_step_tolerance = '1.0e-6'
 []
 
 # Visualization options
