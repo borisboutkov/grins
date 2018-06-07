@@ -61,7 +61,8 @@ namespace GRINS
     const Mixture & gas_mixture() const;
 
     // Evaluate rho
-    libMesh::Real rho ( libMesh::Real T, libMesh::Real p0, libMesh::Real R_mix);
+    libMesh::Real rho ( libMesh::Real T, libMesh::Real p0, std::vector<libMesh::Real> mass_fractions,
+                        std::vector<libMesh::Real> molecular_mass);
 
   protected:
 

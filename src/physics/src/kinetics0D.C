@@ -28,6 +28,7 @@
 
 // GRINS
 #include "grins/assembly_context.h"
+#include "grins/physical_constants.h"
 #include "grins/cached_quantities_enum.h"
 #include "grins/generic_ic_handler.h"
 #include "grins/variables_parsing.h"
@@ -82,7 +83,6 @@ namespace GRINS
   void Kinetics0D<Mixture,Evaluator>::element_time_derivative
   ( bool compute_jacobian, AssemblyContext & context )
   {
-
     // Gas Evaluator
     Evaluator gas_evaluator( *(this->_gas_mixture) );
 
@@ -105,8 +105,8 @@ namespace GRINS
     mole_fractions.resize(n_qpoints);
 
     // Molecular weight of species (kg/kmol)
-    std::vector<libMesh::Real> M;
-    M.resize(n_qpoints);
+    std::vector<std::vector<libMesh::Real>> molecular_mass;
+    molecular_mass.resize(n_qpoints);
 
     // Ideal Gas Constant
     std::vector<libMesh::Real> R;
@@ -121,8 +121,8 @@ namespace GRINS
     h_s.resize(n_qpoints);
 
     // Species Production Rates
-    std::vector<std::vector<libMesh::Real> > omega_dot_s;
-    omega_dot_s.resize(n_qpoints);
+    std::vector<std::vector<libMesh::Real> > omega_dot;
+    omega_dot.resize(n_qpoints);
 
     // Convenience
     const VariableIndex s0_var = this->_species_vars.species(0);
@@ -150,46 +150,51 @@ namespace GRINS
         // Sanity check
         libmesh_assert_greater(T,0);
 
-        mass_fractions[qp].resize(this->_n_species);
-        mole_fractions[qp].resize(this->_n_species);
-        h_s[qp].resize(this->_n_species);
-        omega_dot_s[qp].resize(this->_n_species);
+        mass_fractions[qp].resize(this->n_species());
+        mole_fractions[qp].resize(this->n_species());
+        molecular_mass[qp].resize(this->n_species());
+        h_s[qp].resize(this->n_species());
+        omega_dot[qp].resize(this->n_species());
 
         // Various summations needed for residual evaluations
-        libMesh::Real hwsum = 0,xcsum = 0,xsum = 0,wdotsum = 0, massfrac_sum = 0;
+        libMesh::Real hsum=0, hwmsum = 0,xcsum = 0,hwsum = 0,wdotsum = 0, massfrac_sum = 0;
 
 
         // Pre-calculate above summations
-        for( unsigned int s = 0; s < this->_n_species; s++ )
+        for( unsigned int s = 0; s < this->n_species(); s++ )
           {
             // Ensure species dont overshoot to negative values
             mass_fractions[qp][s] = std::max( 0.0, context.interior_value( this->_species_vars.species(s),qp ));
+            molecular_mass[qp][s] = gas_evaluator.M( s );
 
-            gas_evaluator.X( 1 , mass_fractions[qp], mole_fractions[qp] );
-
+            //gas_evaluator.X( rho , mass_fractions[qp], mole_fractions[qp] );
             h_s[qp][s] = gas_evaluator.h_s( T, s );
             cp[qp] = gas_evaluator.cp(T, _p0, mass_fractions[qp]);
+          }
 
-            xsum += mole_fractions[qp][s];
-            xcsum += mole_fractions[qp][s]*cp[qp];
+        libMesh::Real rho = 0;
+        rho = this->rho(T, _p0, mass_fractions[qp], molecular_mass[qp]);
+        gas_evaluator.omega_dot( T, rho, mass_fractions[qp], omega_dot[qp] );
 
-            wdotsum += omega_dot_s[qp][s];
-            hwsum += h_s[qp][s]*omega_dot_s[qp][s];
-
+        R[qp] = gas_evaluator.R_mix( mass_fractions[qp] );
+        for( unsigned int s = 0; s < this->n_species(); s++ )
+          {
+            hsum += h_s[qp][s];
+            hwsum +=  h_s[qp][s]*omega_dot[qp][s];
+            hwmsum += h_s[qp][s]*omega_dot[qp][s]*mass_fractions[qp][s];
+            wdotsum += omega_dot[qp][s];
             massfrac_sum += mass_fractions[qp][s];
           }
 
-        M[qp] = gas_evaluator.M_mix( mass_fractions[qp] );
-        R[qp] = gas_evaluator.R_mix( mass_fractions[qp] );
-
-        libMesh::Real rho = 0;
-        rho = this->rho(T, _p0, R[qp]);
-        gas_evaluator.omega_dot( T, rho, mass_fractions[qp], omega_dot_s[qp] );
-
-
         {
         libMesh::out <<"temp ... " << T  << std::endl;
-        //libMesh::out <<"temp dot... " << Tdot  << std::endl;
+        libMesh::out <<"temp dot... " << Tdot  << std::endl;
+        libMesh::out <<"rho " << rho  << std::endl;
+
+        libMesh::out << "h_s: ";
+        for (auto i = h_s[0].begin(); i != h_s[0].end(); ++i)
+          std::cout << *i << ' ';
+        libMesh::out << std::endl;
 
         libMesh::out << "mass_frac: ";
         for (auto i = mass_fractions[0].begin(); i != mass_fractions[0].end(); ++i)
@@ -197,41 +202,45 @@ namespace GRINS
         libMesh::out << std::endl;
         libMesh::out << "mass_frac_sum: " << massfrac_sum << std::endl;
 
-        libMesh::out << "mole_frac: ";
-        for (auto i = mole_fractions[0].begin(); i != mole_fractions[0].end(); ++i)
+        libMesh::out << "molecular_mass: ";
+        for (auto i = molecular_mass[0].begin(); i != molecular_mass[0].end(); ++i)
           std::cout << *i << ' ';
         libMesh::out << std::endl;
 
         libMesh::out <<"omega dot " ;
-        for (auto i = omega_dot_s[0].begin(); i != omega_dot_s[0].end(); ++i)
+        for (auto i = omega_dot[0].begin(); i != omega_dot[0].end(); ++i)
           std::cout << *i << ' ';
         libMesh::out << std::endl;
 
+        libMesh::out<< "hsum: " << hsum << std::endl;
         libMesh::out<< "hwsum: " << hwsum << std::endl;
-        libMesh::out<< "xcsum: " << xcsum << std::endl;
+        libMesh::out<< "hwmsum: " << hwmsum << std::endl;
+        libMesh::out<< "Xcpsum: " << xcsum << std::endl;
+        libMesh::out<< "omega_dot sum: " << wdotsum << std::endl;
         }
 
-        libmesh_assert_greater(1e-3, 1-massfrac_sum);
+
+        libmesh_assert_greater(1e-2, 1-massfrac_sum);
 
 
         // Temperature residual
         for (unsigned int i = 0; i != n_T_dofs; ++i)
           {
-            F_T(i) += -(hwsum/xcsum) * T_phi[qp][0];
+            F_T(i) += -(1/(rho*cp[qp])) * (hwmsum) * T_phi[qp][0];
             //libMesh::out<< "Tphi: " << T_phi[qp][0] << std::endl; == 1
             libMesh::out<< "F_T(i): " << F_T(i) << std::endl;
           }
 
         // Species residuals
-        for(unsigned int s=0; s < this->_n_species; s++)
+        for(unsigned int s=0; s < this->n_species(); s++)
           {
+
             // length 1
             libMesh::DenseSubVector<libMesh::Number> &F_s =
               context.get_elem_residual(this->_species_vars.species(s));
 
-            F_s(0) +=  ( omega_dot_s[qp][s] -
-                         mole_fractions[qp][s] * (wdotsum/xsum +  Tdot/T )  )*s_phi[qp][0];
-            //libMesh::out<< "F_s(i): " << F_s(i) << std::endl;
+            F_s(0) +=  ( omega_dot[qp][s] * molecular_mass[qp][s] / rho  )*s_phi[qp][0];
+            libMesh::out<< "F_s(i): " << F_s(0) << std::endl;
             //libMesh::out<< "s_phi: " << s_phi[i][qp] << std::endl; == 1
 
           }
@@ -266,18 +275,22 @@ if( compute_jacobian )
     system->time_evolving(_temp_vars.T(), 1);
 
     // And also each of the involved species
-    for( unsigned int i = 0; i < this->_n_species; i++ )
+    for( unsigned int i = 0; i < this->n_species(); i++ )
       {
         system->time_evolving( _species_vars.species(i), 1 );
       }
   }
 
   template<typename Mixture, typename Evaluator>
-  libMesh::Real Kinetics0D<Mixture,Evaluator>::rho( libMesh::Real T, libMesh::Real p0, libMesh::Real R_mix)
+  libMesh::Real Kinetics0D<Mixture,Evaluator>::rho( libMesh::Real T, libMesh::Real p0, std::vector<libMesh::Real> mass_fractions,
+                        std::vector<libMesh::Real> molecular_mass)
   {
-    // density evaluated using equation of state: P = rho*RT
-    //libMesh::out << "using t, p0, R_mix: " << T <<" "<< p0<< " " << R_mix << std::endl;
-    return  p0/(R_mix*T);
+    libMesh::Real mfbymm = 0;
+    for (unsigned int i = 0; i <= this->n_species(); ++i)
+      mfbymm += mass_fractions[i]/molecular_mass[i];
+
+    libMesh::Real R_universal = GRINS::Constants::R_universal;
+    return  p0/(R_universal*T*mfbymm);
   }
 
 
