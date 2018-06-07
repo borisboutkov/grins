@@ -148,7 +148,7 @@ namespace GRINS
         context.interior_rate(this->_temp_vars.T(), qp, Tdot);
 
         // Sanity check
-        libmesh_assert_greater(T,0);
+        //libmesh_assert_greater(T,0);
 
         mass_fractions[qp].resize(this->n_species());
         mole_fractions[qp].resize(this->n_species());
@@ -159,8 +159,6 @@ namespace GRINS
         // Various summations needed for residual evaluations
         libMesh::Real hsum=0, hwmsum = 0,xcsum = 0,hwsum = 0,wdotsum = 0, massfrac_sum = 0;
 
-
-        // Pre-calculate above summations
         for( unsigned int s = 0; s < this->n_species(); s++ )
           {
             // Ensure species dont overshoot to negative values
@@ -175,13 +173,20 @@ namespace GRINS
         libMesh::Real rho = 0;
         rho = this->rho(T, _p0, mass_fractions[qp], molecular_mass[qp]);
         gas_evaluator.omega_dot( T, rho, mass_fractions[qp], omega_dot[qp] );
-
         R[qp] = gas_evaluator.R_mix( mass_fractions[qp] );
+
+        //convert omega_dot from kg/(s*m^3) to mol/(s*m^3)
+        for( unsigned int s = 0; s < this->n_species(); s++ )
+          {
+            omega_dot[qp][s] *= 1/molecular_mass[qp][s];
+          }
+
+        // Pre-calculate above summations
         for( unsigned int s = 0; s < this->n_species(); s++ )
           {
             hsum += h_s[qp][s];
             hwsum +=  h_s[qp][s]*omega_dot[qp][s];
-            hwmsum += h_s[qp][s]*omega_dot[qp][s]*mass_fractions[qp][s];
+            hwmsum += h_s[qp][s]*omega_dot[qp][s]*molecular_mass[qp][s];
             wdotsum += omega_dot[qp][s];
             massfrac_sum += mass_fractions[qp][s];
           }
@@ -220,13 +225,13 @@ namespace GRINS
         }
 
 
-        libmesh_assert_greater(1e-2, 1-massfrac_sum);
+        //libmesh_assert_greater(1e-2, 1-massfrac_sum);
 
 
         // Temperature residual
         for (unsigned int i = 0; i != n_T_dofs; ++i)
           {
-            F_T(i) += -(1/(rho*cp[qp])) * (hwmsum) * T_phi[qp][0];
+            F_T(i) += -( hwmsum / (rho*cp[qp]) )  * T_phi[qp][0];
             //libMesh::out<< "Tphi: " << T_phi[qp][0] << std::endl; == 1
             libMesh::out<< "F_T(i): " << F_T(i) << std::endl;
           }
@@ -234,12 +239,11 @@ namespace GRINS
         // Species residuals
         for(unsigned int s=0; s < this->n_species(); s++)
           {
-
             // length 1
             libMesh::DenseSubVector<libMesh::Number> &F_s =
               context.get_elem_residual(this->_species_vars.species(s));
 
-            F_s(0) +=  ( omega_dot[qp][s] * molecular_mass[qp][s] / rho  )*s_phi[qp][0];
+            F_s(0) +=  ( (omega_dot[qp][s]) * molecular_mass[qp][s] / rho  )*s_phi[qp][0];
             libMesh::out<< "F_s(i): " << F_s(0) << std::endl;
             //libMesh::out<< "s_phi: " << s_phi[i][qp] << std::endl; == 1
 
@@ -286,10 +290,17 @@ if( compute_jacobian )
                         std::vector<libMesh::Real> molecular_mass)
   {
     libMesh::Real mfbymm = 0;
-    for (unsigned int i = 0; i <= this->n_species(); ++i)
-      mfbymm += mass_fractions[i]/molecular_mass[i];
+    for (unsigned int i = 0; i < this->n_species(); ++i)
+      {
+        libMesh::out<< "mf" << mass_fractions[i] << std::endl;
+        libMesh::out<< "mol mass" << molecular_mass[i] << std::endl;
+        libMesh::out<< "div" << mass_fractions[i]/molecular_mass[i] << std::endl;
+        mfbymm += mass_fractions[i]/molecular_mass[i];
 
-    libMesh::Real R_universal = GRINS::Constants::R_universal;
+      }
+
+    libMesh::Real R_universal = GRINS::Constants::R_universal / 1000.0; /* J/kmol-K --> J/mol-K */
+    libMesh::out << "R univ value" << R_universal << std::endl;
     return  p0/(R_universal*T*mfbymm);
   }
 
