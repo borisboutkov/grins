@@ -51,6 +51,10 @@ namespace GRINS
     virtual void element_time_derivative( bool compute_jacobian,
                                           AssemblyContext & context );
 
+    virtual void mass_residual( bool compute_jacobian,
+                                AssemblyContext & context );
+
+
     // Sets temp variables to be time-evolving
     virtual void set_time_evolving_vars( libMesh::FEMSystem* system );
 
