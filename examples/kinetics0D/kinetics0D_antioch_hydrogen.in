@@ -1,0 +1,112 @@
+
+# Solver Options
+[SolverOptions]
+   [./TimeStepping]
+      solver_type = 'libmesh_euler_solver'
+      delta_t = '1.0e-9'
+      n_timesteps = '300'
+      theta = '1'
+   []
+[]
+
+#Linear and nonlinear solver options
+[linear-nonlinear-solver]
+
+   continue_after_max_iterations = 'true'
+   max_nonlinear_iterations = '200'
+   max_linear_iterations = '2500'
+
+   minimum_linear_tolerance = '1.0e-6'
+
+   use_numerical_jacobians_only = 'true'
+
+  absolute_residual_tolerance = '1.0e-2'
+#  relative_residual_tolerance = '0'
+   relative_step_tolerance = '1.0e-8'
+[]
+
+# Enabled Physics classes
+[Physics]
+   enabled_physics = 'Kinetics0D'
+   [./Kinetics0D]
+    material = 'OzoneGas'
+
+   # Initial Conditions
+    ic_ids = '0'
+    ic_types = 'parsed'
+    ic_variables = 'Y_O:Y_O2:Y_H:Y_H2:Y_H2O:Y_OH:T'
+    ic_values = '{0.1}{0.1}{0.1}{0.1}{0.1}{0.5}{950}'
+
+[]
+
+# Mesh related options
+[Mesh]
+  [./Generation]
+  dimension = '0'
+[]
+
+[Materials]
+  [./OzoneGas]
+     [./ThermodynamicPressure]
+        value = '1e5' #[Pa]
+     [../GasMixture]
+        thermochemistry_library = 'antioch'
+        species = 'O O2 H H2 H2O OH'
+        kinetics_data = 'hydrogen.xml'
+
+        [./Antioch]
+           transport_model = 'constant'
+           thermo_model = 'cea'
+           viscosity_model = 'constant'
+           thermal_conductivity_model = 'constant'
+           mass_diffusivity_model = 'constant_lewis'
+           cea_data = 'hydrogen_cea_data.dat'
+           species_data = 'hydrogen_species_data.dat'
+
+     [../../Viscosity]
+        value = '1.0e-5'
+     [../ThermalConductivity]
+        value = '0.02'
+     [../LewisNumber]
+        value = '1.0'
+[]
+
+[BoundaryConditions]
+   bc_ids = ''
+   bc_id_name_map = ''
+[]
+
+[Variables]
+  [./Temperature]
+      names = 'T'
+      fe_family = 'LAGRANGE'
+      order = 'FIRST'
+
+  [../SpeciesMassFractions]
+      names = 'Y_'
+      fe_family = 'LAGRANGE'
+      order = 'FIRST'
+      material = 'OzoneGas'
+[]
+
+# Visualization options
+[vis-options]
+   output_vis = 'true'
+   vis_output_file_prefix = 'output'
+   output_residual = 'false'
+   output_format = 'xda'
+[]
+
+# Options for print info to the screen
+[screen-options]
+
+   system_name = 'kinetics0D_hydrogen'
+
+   print_equation_system_info = 'true'
+   print_mesh_info = 'true'
+   print_log_info = 'true'
+   solver_verbose = 'true'
+   solver_quiet = 'false'
+
+   print_element_jacobians = 'false'
+[]
