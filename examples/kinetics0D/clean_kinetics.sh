@@ -2,7 +2,7 @@
 
 echo
 echo "Cleaning logs and creating plot friendly data!"
-echo "Usage: ./clean_logs.sh my_output_dir"
+echo "Usage: ./clean_kinetics.sh my_output_dir"
 echo "Note: dont include trailing '/' on subdir or plotter will error!"
 echo
 
@@ -13,7 +13,7 @@ if [ -z "$1" ]
 then
     echo "Error: No argument supplied :("
     echo "Usage: provide log directory to this command"
-    echo "IE:./clean_logs.sh my_kinetics_run_data_dir"
+    echo "IE:./clean_kinetics.sh my_kinetics_run_data_dir my_input.in"
     exit 1
 fi
 FILEDIR=$1
@@ -36,6 +36,23 @@ fi
 rm -f $FILEDIR/*.xda
 rm -f $FILEDIR*.png
 
+if [ -z "$2" ]
+then
+    echo "Error: No input file argument supplied :("
+    echo "Usage: provide log directory to this command"
+    echo "IE:./clean_kinetics.sh my_kinetics_run_data_dir my_input.in"
+    exit 1
+fi
+INPUTFILE=$2
+
+# quite flexible :)
+SPECIES_STR=$( grep -i "species = " $INPUTFILE | head -1 | cut -c 20- )
+SPECIES_HEADER="TS Temp ${SPECIES_STR::-1}"
+
+# prepend header info to clean data csv file
+echo $SPECIES_HEADER >> $CWD/$OUTFILE
+
+
 #will use number of dirs as the number of data points to collect (one point per proc)
 NUMFILES=$( find . -name "*.xda" | wc -l )
 echo
@@ -47,7 +64,6 @@ find .  -name "*.xda" -exec mv -t $FILEDIR {} +
 cd $FILEDIR
 
 # prepend header info to clean data csv file
-HEADERSTR="Timestep, Temp, O, O2, O3"
 echo $HEADERSTR >> $CWD/$OUTFILE
 
 # use a counter to ensure each file gets hit.

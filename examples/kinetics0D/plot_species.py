@@ -19,7 +19,7 @@ print "From basedir: " + fname
 data = np.genfromtxt(myfile, delimiter=',', dtype=float, skip_header=1)
 
 # extract header
-headerdata = np.genfromtxt(myfile, delimiter=',', dtype=str, names=True)
+headerdata = np.genfromtxt(myfile, delimiter=' ', dtype=str, names=True)
 header = np.array(headerdata.dtype.names)
 
 print
