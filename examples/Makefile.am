@@ -72,6 +72,7 @@ cavity_LDADD = $(LIBGRINS_LIBS)
 #=======================================================================
 kinetics0Ddir = $(prefix)/examples/kinetics0D
 kinetics0D_DATA = $(top_srcdir)/examples/kinetics0D/ozone.xml
+kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/Hydrogen.xml
 kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/kinetics0D_antioch.in
 kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/ozone_cea_data.dat
 kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/plot_species.py
