@@ -81,8 +81,8 @@ kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/hydrogen_cea_data.dat
 kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/hydrogen_species_data.dat
 kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/hydrogen_transport_data.dat
 kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/kinetics0D_antioch_hydrogen.in
-kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/clean_kinetics.sh
 kinetics0D_SCRIPTS = $(top_builddir)/examples/kinetics0D/run.sh
+kinetics0D_SCRIPTS += $(top_builddir)/examples/kinetics0D/clean_kinetics.sh
 
 
 EXTRA_DIST += $(kinetics0D_DATA)

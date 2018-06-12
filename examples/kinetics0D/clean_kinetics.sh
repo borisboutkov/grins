@@ -47,19 +47,21 @@ INPUTFILE=$2
 
 # quite flexible :)
 SPECIES_STR=$( grep -i "species = " $INPUTFILE | head -1 | cut -c 20- )
-SPECIES_HEADER="TS Temp ${SPECIES_STR::-1}"
+SPECIES_CLEAN=$( echo $SPECIES_STR | sed 's/.$//' )
+SPECIES_HEADER="TS Temp $SPECIES_CLEAN"
+
+echo "found species: $SPECIES_HEADER"
 
 # prepend header info to clean data csv file
 echo $SPECIES_HEADER >> $CWD/$OUTFILE
 
 
 #will use number of dirs as the number of data points to collect (one point per proc)
-NUMFILES=$( find . -name "*.xda" | wc -l )
+NUMFILES=$( find . -maxdepth 1 -name "*.xda" | wc -l )
 echo
 echo "Beginning processing of $NUMFILES total files."
 echo
-
-find .  -name "*.xda" -exec mv -t $FILEDIR {} +
+find . -maxdepth 1 -name "*.xda"  -exec mv -t $FILEDIR {} +
 
 cd $FILEDIR
 
