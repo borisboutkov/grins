@@ -29,13 +29,13 @@
 [Physics]
    enabled_physics = 'Kinetics0D'
    [./Kinetics0D]
-    material = 'OzoneGas'
+    material = 'GriMechGas'
 
    # Initial Conditions
     ic_ids = '0'
     ic_types = 'parsed'
-    ic_variables = 'Y_O:Y_O2:Y_O3:T'
-    ic_values = '{0.1}{0.1}{0.8}{950}'
+    ic_variables = 'Y_O:Y_O2:Y_H:Y_H2:Y_H2O:Y_OH:T'
+    ic_values = '{0.1}{0.1}{0.1}{0.1}{0.1}{0.5}{950}'
 
 []
 
@@ -46,27 +46,35 @@
 []
 
 [Materials]
-  [./OzoneGas]
+  [./GriMechGas]
      [./ThermodynamicPressure]
         value = '1e5' #[Pa]
      [../GasMixture]
-        thermochemistry_library = 'antioch'
-        species = 'O O2 O3'
-        kinetics_data = 'ozone.xml'
+        thermochemistry_library = 'cantera'
+        species = 'O O2 H H2 H2O OH'
+        kinetics_data = 'grimech30.dat'
+
+        [./Cantera]
+           gas_mixture = 'grimech30'
+
 
         [./Antioch]
-           transport_model = 'constant'
            thermo_model = 'cea'
+           cea_data = 'thermo30.dat'
+           species_data = 'hydrogen_species_data.dat'
+
+           # satisfy some requests for things we dont need
            viscosity_model = 'constant'
            thermal_conductivity_model = 'constant'
            mass_diffusivity_model = 'constant_lewis'
-           cea_data = 'ozone_cea_data.dat'
-           species_data = 'ozone_species_data.dat'
+           transport_model = 'constant'
+           vibration_data = 'default'
+           electronic_data = 'default'
 
-     [../../Viscosity]
-        value = '1.0e-5'
+   [../../Viscosity]
+        value = '1.0'
      [../ThermalConductivity]
-        value = '0.02'
+        value = '1.0'
      [../LewisNumber]
         value = '1.0'
 []
@@ -86,13 +94,13 @@
       names = 'Y_'
       fe_family = 'LAGRANGE'
       order = 'FIRST'
-      material = 'OzoneGas'
+      material = 'GriMechGas'
 []
 
 # Visualization options
 [vis-options]
    output_vis = 'true'
-   vis_output_file_prefix = 'output'
+   vis_output_file_prefix = 'grimech3'
    output_residual = 'false'
    output_format = 'xda'
 []
@@ -100,7 +108,7 @@
 # Options for print info to the screen
 [screen-options]
 
-   system_name = 'kinetics0D'
+   system_name = 'kinetics0D_grimech3'
 
    print_equation_system_info = 'true'
    print_mesh_info = 'true'
@@ -109,4 +117,25 @@
    solver_quiet = 'false'
 
    print_element_jacobians = 'false'
+
+   echo_physics = 'true'
+   echo_qoi = 'true' # which QoIs activated
+[]
+
+[Output]
+  [./Display]
+    print_qoi = 'true'
+[]
+
+# Options for adaptivity
+[QoI]
+  enabled_qois = 'parsed_interior'
+
+# Sensitivity analysis
+#adjoint_sensitivity_parameters = 'Materials/Viscosity/mu'
+#forward_sensitivity_parameters = 'Materials/Viscosity/mu'
+
+[./ParsedInterior]
+  qoi_functional = 'T'
+
 []

@@ -68,22 +68,28 @@ cavity_SOURCES = cavity_benchmark/cavity.C
 cavity_LDADD = $(LIBGRINS_LIBS)
 
 #=======================================================================
-# Kinetics 0D Example
+# Kinetics 0D Examples
 #=======================================================================
 kinetics0Ddir = $(prefix)/examples/kinetics0D
+#Ozone
 kinetics0D_DATA  = $(top_srcdir)/examples/kinetics0D/ozone.xml
-kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/hydrogen.xml
-kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/kinetics0D_antioch.in
 kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/ozone_cea_data.dat
-kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/plot_species.py
 kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/ozone_species_data.dat
+kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/kinetics0D_antioch_ozone.in
+#Hydrogen
+kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/hydrogen.xml
 kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/hydrogen_cea_data.dat
 kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/hydrogen_species_data.dat
-kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/hydrogen_transport_data.dat
 kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/kinetics0D_antioch_hydrogen.in
+#GRI_Mech3
+kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/grimech30.dat
+kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/thermo30.dat
+kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/kinetics0D_antioch_gri.in
+#General
+kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/plot_species.py
+kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/clean_kinetics.sh
 kinetics0D_SCRIPTS = $(top_builddir)/examples/kinetics0D/run.sh
 kinetics0D_SCRIPTS += $(top_builddir)/examples/kinetics0D/clean_kinetics.sh
-
 
 EXTRA_DIST += $(kinetics0D_DATA)
 

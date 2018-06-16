@@ -29,13 +29,13 @@
 [Physics]
    enabled_physics = 'Kinetics0D'
    [./Kinetics0D]
-    material = 'HydrogenGas'
+    material = 'OzoneGas'
 
    # Initial Conditions
     ic_ids = '0'
     ic_types = 'parsed'
-    ic_variables = 'Y_O:Y_O2:Y_H:Y_H2:Y_H2O:Y_OH:T'
-    ic_values = '{0.1}{0.1}{0.1}{0.1}{0.1}{0.5}{950}'
+    ic_variables = 'Y_O:Y_O2:Y_O3:T'
+    ic_values = '{0.1}{0.1}{0.8}{950}'
 
 []
 
@@ -46,18 +46,18 @@
 []
 
 [Materials]
-  [./HydrogenGas]
+  [./OzoneGas]
      [./ThermodynamicPressure]
         value = '1e5' #[Pa]
      [../GasMixture]
         thermochemistry_library = 'antioch'
-        species = 'O O2 H H2 H2O OH'
-        kinetics_data = 'hydrogen.xml'
+        species = 'O O2 O3'
+        kinetics_data = 'ozone.xml'
 
         [./Antioch]
            thermo_model = 'cea'
-           cea_data = 'hydrogen_cea_data.dat'
-           species_data = 'hydrogen_species_data.dat'
+           cea_data = 'ozone_cea_data.dat'
+           species_data = 'ozone_species_data.dat'
 
            # satisfy some requests for things we dont need
            viscosity_model = 'constant'
@@ -90,13 +90,13 @@
       names = 'Y_'
       fe_family = 'LAGRANGE'
       order = 'FIRST'
-      material = 'HydrogenGas'
+      material = 'OzoneGas'
 []
 
 # Visualization options
 [vis-options]
    output_vis = 'true'
-   vis_output_file_prefix = 'hydrogen'
+   vis_output_file_prefix = 'ozone'
    output_residual = 'false'
    output_format = 'xda'
 []
@@ -104,7 +104,7 @@
 # Options for print info to the screen
 [screen-options]
 
-   system_name = 'kinetics0D_hydrogen'
+   system_name = 'kinetics0D_ozone'
 
    print_equation_system_info = 'true'
    print_mesh_info = 'true'
@@ -119,21 +119,20 @@
 
 []
 
-
 [Output]
   [./Display]
     print_qoi = 'true'
 []
 
-
 # Options for adaptivity
 [QoI]
   enabled_qois = 'parsed_interior'
 
-  # Sensitivity analysis
-  #adjoint_sensitivity_parameters = 'Materials/Viscosity/mu'
-  #forward_sensitivity_parameters = 'Materials/Viscosity/mu'
+# Sensitivity analysis
+#adjoint_sensitivity_parameters = 'Materials/Viscosity/mu'
+#forward_sensitivity_parameters = 'Materials/Viscosity/mu'
 
-  [./ParsedInterior]
-    qoi_functional = 'T'
+[./ParsedInterior]
+  qoi_functional = 'T'
+
 []
