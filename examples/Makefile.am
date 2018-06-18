@@ -71,6 +71,7 @@ cavity_LDADD = $(LIBGRINS_LIBS)
 # Kinetics 0D Examples
 #=======================================================================
 kinetics0Ddir = $(prefix)/examples/kinetics0D
+kinetics0D_PROGRAMS = kinetics
 #Ozone
 kinetics0D_DATA  = $(top_srcdir)/examples/kinetics0D/ozone.xml
 kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/ozone_cea_data.dat
@@ -82,6 +83,7 @@ kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/hydrogen_cea_data.dat
 kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/hydrogen_species_data.dat
 kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/kinetics0D_antioch_hydrogen.in
 #GRI_Mech3
+kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/grimech30.xml
 kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/grimech30.dat
 kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/thermo30.dat
 kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/kinetics0D_antioch_gri.in
@@ -90,6 +92,9 @@ kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/plot_species.py
 kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/clean_kinetics.sh
 kinetics0D_SCRIPTS = $(top_builddir)/examples/kinetics0D/run.sh
 kinetics0D_SCRIPTS += $(top_builddir)/examples/kinetics0D/clean_kinetics.sh
+
+kinetics_SOURCES = kinetics0D/kinetics.C
+kinetics_LDADD = $(LIBGRINS_LIBS)
 
 EXTRA_DIST += $(kinetics0D_DATA)
 
