@@ -4,4 +4,4 @@ GRINS_RUN=${GRINS_RUN:-$LIBMESH_RUN}
 DEFAULT_SOLVER_OPTIONS=""
 GRINS_SOLVER_OPTIONS=${GRINS_SOLVER_OPTIONS:-$LIBMESH_OPTIONS:$DEFAULT_SOLVER_OPTIONS}
 
-$GRINS_RUN @prefix@/bin/grins @prefix@/examples/kinetics0D/kinetics0D_antioch_hydrogen.in $GRINS_SOLVER_OPTIONS
+$GRINS_RUN @prefix@/bin/grins @prefix@/examples/kinetics0D/ozone.in $GRINS_SOLVER_OPTIONS

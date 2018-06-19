@@ -30,7 +30,6 @@
 #include "grins/composite_qoi.h"
 
 #include "libmesh/time_solver.h"
-#include "libmesh/memory_solution_history.h"
 #include "libmesh/numeric_vector.h"
 
 
@@ -50,18 +49,7 @@ int main(int argc, char* argv[])
   GRINS::Simulation & sim = runner.get_simulation();
   GRINS::MultiphysicsSystem * system = sim.get_multiphysics_system();
 
-  libMesh::MemorySolutionHistory  hist (*system);
-  system->get_time_solver().set_solution_history(hist);
-  //hist.set_overwrite_previously_stored(true);
-
   runner.run();
-
-  system->get_time_solver().retrieve_timestep();
-
-  //std::map<std::string, std::unique_ptr<libMesh::NumericVector<libMesh::Number>> saved_vectors;
-  //  for ( auto it = hist->stored_solutions.begin(); it = hist->stored_solutions.end(); it++)
-  //  std::cout <<std::fixed <<std::setprecision(16) << (*it)->first <<std::endl;
-
 
 
   GRINS::CompositeQoI * comp_qoi = libMesh::cast_ptr<GRINS::CompositeQoI*>(system->get_qoi());
@@ -70,12 +58,12 @@ int main(int argc, char* argv[])
   system->assemble_qoi(qs);
   libMesh::Real qoi = sim.get_qoi_value(0);
 
+  libMesh::out << "printing my qoi...." << std::endl;
   if (system->get_mesh().comm().rank() == 0)
     std::cout <<std::fixed <<std::setprecision(16) <<qoi <<std::endl;
 
-
 #else
-  libmesh_error_msg("ERROR: GRINS must be built with Antioch to use the Kinetics0D example. Please reconfigure your build to include the Antioch library.");
+  libmesh_error_msg("ERROR: GRINS must be built with Antioch to use this Kinetics0D example. Please reconfigure your build to include the Antioch library.");
 #endif
   return 0;
 }

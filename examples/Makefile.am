@@ -76,17 +76,17 @@ kinetics0D_PROGRAMS = kinetics
 kinetics0D_DATA  = $(top_srcdir)/examples/kinetics0D/ozone.xml
 kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/ozone_cea_data.dat
 kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/ozone_species_data.dat
-kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/kinetics0D_antioch_ozone.in
+kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/ozone.in
 #Hydrogen
 kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/hydrogen.xml
 kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/hydrogen_cea_data.dat
 kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/hydrogen_species_data.dat
-kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/kinetics0D_antioch_hydrogen.in
+kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/hydrogen.in
 #GRI_Mech3
 kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/grimech30.xml
 kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/grimech30.dat
 kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/thermo30.dat
-kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/kinetics0D_antioch_gri.in
+kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/grimech30.in
 #General
 kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/plot_species.py
 kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/clean_kinetics.sh
