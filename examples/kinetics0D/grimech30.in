@@ -29,7 +29,7 @@
 [Physics]
    enabled_physics = 'Kinetics0D'
    [./Kinetics0D]
-    material = 'GriMechGas'
+    material = 'GriMech30Gas'
 
    # Initial Conditions
     ic_ids = '0'
@@ -46,22 +46,18 @@
 []
 
 [Materials]
-  [./GriMechGas]
+  [./GriMech30Gas]
      [./ThermodynamicPressure]
         value = '1e5' #[Pa]
      [../GasMixture]
-        thermochemistry_library = 'cantera'
+        thermochemistry_library = 'antioch'
         species = 'O O2 H H2 H2O OH'
-        kinetics_data = 'grimech30.dat'
-
-        [./Cantera]
-           gas_mixture = 'grimech30'
-
+        kinetics_data = 'grimech30.xml'
 
         [./Antioch]
            thermo_model = 'cea'
-           cea_data = 'thermo30.dat'
-           species_data = 'hydrogen_species_data.dat'
+           cea_data = 'grimech30_thermo.dat'
+           species_data = 'grimech30_species_data.dat'
 
            # satisfy some requests for things we dont need
            viscosity_model = 'constant'
@@ -94,13 +90,13 @@
       names = 'Y_'
       fe_family = 'LAGRANGE'
       order = 'FIRST'
-      material = 'GriMechGas'
+      material = 'GriMech30Gas'
 []
 
 # Visualization options
 [vis-options]
    output_vis = 'true'
-   vis_output_file_prefix = 'grimech3'
+   vis_output_file_prefix = 'grimech30'
    output_residual = 'false'
    output_format = 'xda'
 []
@@ -108,7 +104,7 @@
 # Options for print info to the screen
 [screen-options]
 
-   system_name = 'kinetics0D_grimech3'
+   system_name = 'kinetics0D_grimech30'
 
    print_equation_system_info = 'true'
    print_mesh_info = 'true'
