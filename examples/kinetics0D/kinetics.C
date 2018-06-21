@@ -46,11 +46,19 @@ int main(int argc, char* argv[])
   // Parse the input file
   const GetPot & input = runner.get_input_file();
 
+  // Files from which well read in solution data
+  std::string filename = input("Kinetics0D/output_prefix","");
+  if (filename == "")
+    libmesh_error_msg("ERROR: please specify an output file prefix for the 0D-kinetics example!");
+
   GRINS::Simulation & sim = runner.get_simulation();
   GRINS::MultiphysicsSystem * system = sim.get_multiphysics_system();
 
   runner.run();
 
+  // Now build a data structure of the solution to house their history
+  //system->get_mesh().read("hydrogen.xda");
+  //libMesh::out << "mesh read in!...." << std::endl;
 
   GRINS::CompositeQoI * comp_qoi = libMesh::cast_ptr<GRINS::CompositeQoI*>(system->get_qoi());
   libMesh::QoISet qs;

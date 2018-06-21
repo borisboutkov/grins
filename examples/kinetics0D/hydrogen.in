@@ -125,6 +125,10 @@
     print_qoi = 'true'
 []
 
+[Kinetics0D]
+  output_prefix = 'hydrogen'
+[]
+
 
 # Options for adaptivity
 [QoI]
