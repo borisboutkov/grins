@@ -54,7 +54,7 @@ namespace GRINS
     //! Constructor
     /*! Constructor takes GetPot object to read any input options associated
       with this QoI as well as a chemistry pointer */
-    IgnitionDelayQoI( const GetPot & input, const std::string& qoi_name, const std::shared_ptr<GRINS::AntiochChemistry> chem );
+    IgnitionDelayQoI( const GetPot & input, const std::string& qoi_name, const std::shared_ptr<GRINS::AntiochChemistry>& chem );
 
     virtual ~IgnitionDelayQoI();
 
@@ -104,7 +104,7 @@ namespace GRINS
     unsigned int _species_idx;
 
     //! Manual copy constructor due to the UniquePtr
-    IgnitionDelayQoI(const IgnitionDelayQoI& original);
+    //IgnitionDelayQoI(const IgnitionDelayQoI& original);
 
     //! Read in solution history from output files. Save to internal struct
     void read_solution_history( const GetPot& input, AssemblyContext& context );
@@ -119,10 +119,13 @@ namespace GRINS
     std::string _fuel_species;
 
     //! Percetage of initial fuel consumed
-    std::string _fuel_consumption;
+    libMesh::Real  _fuel_consumption;
 
     //! Number of timesteps in the simulation
     unsigned int _n_timesteps;
+
+    //! Size of timestep in the simulation
+    libMesh::Real _dt;
 
   private:
     //! User never call default constructor.

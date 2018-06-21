@@ -49,7 +49,7 @@
 
 namespace GRINS
 {
-  IgnitionDelayQoI::IgnitionDelayQoI( const GetPot & input, const std::string& qoi_name, const std::shared_ptr<GRINS::AntiochChemistry> chem )
+  IgnitionDelayQoI::IgnitionDelayQoI( const GetPot & input, const std::string& qoi_name, const std::shared_ptr<GRINS::AntiochChemistry>& chem )
     : QoIBase(qoi_name),
       _chemistry(chem),
       _T_var(GRINSPrivate::VariableWarehouse::get_variable_subclass<PrimitiveTempFEVariables>("Temperature")),
@@ -60,16 +60,16 @@ namespace GRINS
 
     // Parse input file for IgnitionDelay parameters
     _filename_prefix = input("QoI/filename_prefix","");
-    if (_filename_prefix == "")
+    if ( _filename_prefix == "" )
       libmesh_error_msg("ERROR: Could not QoI/filename_prefix!");
 
-    if (input.have_variable("QoI/IgnitionDelay/fuel_species"))
-      _fuel_species = input("QoI/IgnitionDelay/function", "");
+    if ( input.have_variable("QoI/IgnitionDelay/fuel_species") )
+      _fuel_species = input("QoI/IgnitionDelay/fuel_species", "None");
     else
       libmesh_error_msg("ERROR: Could not QoI/IgnitionDelay/fuel_species!");
 
-    if (input.have_variable("QoI/IgnitionDelay/fuel_consumption"))
-      _fuel_consumption = input("QoI/IgnitionDelay/fuel_consumption", "0.1");
+    if ( input.have_variable("QoI/IgnitionDelay/fuel_consumption") )
+      _fuel_consumption = input("QoI/IgnitionDelay/fuel_consumption", 0.1);
     else
       libmesh_error_msg("ERROR: Could not find QoI/IgnitionDelay/fuel_consumption");
 
@@ -78,8 +78,14 @@ namespace GRINS
     else
       libmesh_error_msg("ERROR: Could not find valid entry for n_timesteps!");
 
+    if( input.have_variable("SolverOptions/TimeStepping/delta_t") )
+        _dt = input("SolverOptions/TimeStepping/delta_t",0.0);
+    else
+      libmesh_error_msg("ERROR: Could not find valid entry for delta_t");
+
   }
 
+  /*
   IgnitionDelayQoI::IgnitionDelayQoI( const IgnitionDelayQoI& original )
     : QoIBase(original),
       _chemistry(original._chemistry),
@@ -90,10 +96,12 @@ namespace GRINS
       _filename_prefix(original._filename_prefix),
       _fuel_species(original._fuel_species),
       _fuel_consumption(original._fuel_consumption),
-      _n_timesteps(original._n_timesteps)
+      _n_timesteps(original._n_timesteps),
+      _dt(original._dt)
   {
     // do what in the copy?
   }
+  */
 
   IgnitionDelayQoI::~IgnitionDelayQoI() {}
 
@@ -116,18 +124,17 @@ namespace GRINS
                                              libMesh::Number & local_qoi )
   {
     // for now do nothing. will need to max over all proc?
-    /*
+
     communicator.max(local_qoi);
     sys_qoi = local_qoi;
     QoIBase::_qoi_value = sys_qoi;
-    */
+
   }
 
 
   void IgnitionDelayQoI::read_solution_history( const GetPot& input, AssemblyContext& context )
   {
-
-    // Now do the actual construction of the solution history
+    // Do the actual construction of the solution history
 
     libMesh::out << "reading solution history data..."<< std::endl;
     // libMesh cant read back in a 0-dim xda file... system calls for now!
@@ -142,23 +149,23 @@ namespace GRINS
     int n_species = context.get_dof_indices().size();
     this->_solution_history.resize(_n_timesteps, std::vector<libMesh::Real>(n_species));
 
-    // Clean output data using bash..
+    // Clean output data using the Kinetics0D/clean_kinetics.sh script... (See note above)
     std::string clean_data_command = "./clean_kinetics.sh " + _filename_prefix + " " + _filename_prefix+ ".in";
     std::system(clean_data_command.c_str());
 
     // Read the generated csv into a _solution_history
     std::ifstream data("./" + _filename_prefix + "/clean_data.csv");
 
-
     int row = 0;
     std::string line;
-    //read away header info
+    // Read away header info line and line of spaces
+    std::getline(data,line);
     std::getline(data,line);
 
+    // now parse the rest of the file
     while (std::getline(data,line))
       {
         std::stringstream  lineStream(line);
-        std::string        cell;
         std::vector<libMesh::Real> one_row;
         GRINS::StringUtilities::split_string_real( lineStream.str(), "," , one_row );
         _solution_history[row] = one_row;
@@ -166,18 +173,18 @@ namespace GRINS
       }
 
     // check we have what we want
-    libMesh::out << "printing soln_history data..."<< std::endl;
-    libMesh::out << "of size: "<<_solution_history.size() << "x" << _solution_history[0].size() << std::endl;
 
-    for (int i = 0; i < _solution_history.size(); i++)
-      {
-        for (int j = 0; j < _solution_history[i].size(); j++)
-          {
-            libMesh::out << _solution_history[i][j] << " ";
-          }
-        libMesh::out << std::endl;
-      }
+      libMesh::out << "printing soln_history data..."<< std::endl;
+      libMesh::out << "of size: "<<_solution_history.size() << "x" << _solution_history[0].size() << std::endl;
 
+      for (int i = 0; i < _solution_history.size(); i++)
+        {
+          for (int j = 0; j < _solution_history[i].size(); j++)
+            {
+              libMesh::out << _solution_history[i][j] << " ";
+            }
+          libMesh::out << std::endl;
+        }
 
   }
 
@@ -191,14 +198,37 @@ namespace GRINS
   void IgnitionDelayQoI::element_qoi( AssemblyContext& context,
                                        const unsigned int qoi_index )
   {
-
     this->read_solution_history(_input, context);
 
     /*! \todo Need to generalize this to the multiple QoI case */
     libMesh::Number& qoi = context.get_qois()[qoi_index];
 
-    qoi = context.time;
+    libMesh::out << "qoi fuel comsumption value : " << _fuel_consumption << std::endl;
 
+    libMesh::out << "qoi fuel : " << _fuel_species << std::endl;
+
+    // +1 because we added timestep data to the clean_data file
+    unsigned int fuel_var_num = context.get_system().variable_number( _fuel_species ) + 1 ;
+
+    libMesh::out << "qoi fuel var number : " << std::to_string(fuel_var_num) << std::endl;
+
+    int ts = 0;
+    libMesh::Real initial_fuel = _solution_history[0][fuel_var_num];
+    libMesh::out << "initial fuel amount : " << std::to_string(initial_fuel) << std::endl;
+
+
+    for (int i = 0 ; i < _solution_history.size(); ++i )
+      {
+        if (  _solution_history[i][fuel_var_num]  < (1 -_fuel_consumption) * initial_fuel )
+          {
+            ts = _solution_history[i][0];
+            libMesh::out << "IGNITION! Remaining fuel " << std::to_string(_solution_history[i][fuel_var_num]) << " at timestep " << ts << std::endl;
+            libMesh::out << "_dt  " <<  _dt << std::endl;
+            libMesh::out << "IGNITION QOI " <<  _dt*(double)ts << std::endl;
+            qoi = (double)ts*_dt;
+            return;
+          }
+      }
   }
 
   void IgnitionDelayQoI::element_qoi_derivative( AssemblyContext& context,

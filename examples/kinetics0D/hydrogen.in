@@ -136,7 +136,7 @@
   [./IgnitionDelay]
      material = 'HydrogenGas'
 
-     fuel_species = 'Y_H'
+     fuel_species = 'Y_OH'
      fuel_consumption = '0.2' # 20% of initial fuel used up
 
 []
