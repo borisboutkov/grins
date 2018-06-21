@@ -42,6 +42,7 @@
 
 #if GRINS_HAVE_ANTIOCH
 #include "grins/antioch_chemistry.h"
+#include "grins/ignition_delay_qoi.h"
 #endif
 
 #if GRINS_HAVE_CANTERA
@@ -204,6 +205,20 @@ namespace GRINS
         qoi = new SpectroscopicAbsorption(input,qoi_name,absorb);
       }
 
+    else if ( qoi_name == ignition_delay )
+      {
+        std::string material;
+        this->get_var_value<std::string>(input,material,"QoI/IgnitionDelay/material","NoMaterial!");
+
+        ChemistryBuilder chem_builder;
+#if GRINS_HAVE_ANTIOCH
+        std::unique_ptr<AntiochChemistry> chem_ptr;
+        chem_builder.build_chemistry(input,material,chem_ptr);
+        std::shared_ptr<AntiochChemistry> chem(chem_ptr.release());
+#endif
+        qoi = new IgnitionDelayQoI(input,qoi_name,chem);
+
+      }
     else
       {
         libMesh::err << "Error: Invalid QoI name " << qoi_name << std::endl;

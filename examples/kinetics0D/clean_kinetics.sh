@@ -50,13 +50,11 @@ SPECIES_STR=$( grep -i "species = " $INPUTFILE | head -1 | cut -c 20- )
 SPECIES_CLEAN=$( echo $SPECIES_STR | sed 's/.$//' )
 SPECIES_HEADER="TS Temp $SPECIES_CLEAN"
 
-echo "found species: $SPECIES_HEADER"
+echo "found header columns: $SPECIES_HEADER"
 
 # prepend header info to clean data csv file
 echo $SPECIES_HEADER >> $CWD/$OUTFILE
 
-
-#will use number of dirs as the number of data points to collect (one point per proc)
 NUMFILES=$( find . -maxdepth 1 -name "*.xda" | wc -l )
 echo
 echo "Beginning processing of $NUMFILES total files."
@@ -71,7 +69,7 @@ echo $HEADERSTR >> $CWD/$OUTFILE
 # use a counter to ensure each file gets hit.
 proccessed_count=0
 
-for file in $(find . -name '*.xda')
+for file in $(find . -name '*.xda' | ls -v *.xda)
 do
     # Make sure we have files to work on ...
     if [ -f $file ]
@@ -87,10 +85,14 @@ do
         WRITESTR=""
 
         # first extract the time_step from filename
-        # strip all (including _np) up to _npxx.log and then just trim to only get digits
-        tmp=${file#*_np}
-        NP_VAL=$(echo $tmp | tr -d -c 0-9)
-        WRITESTR="$NP_VAL"
+        # strip all nonintegers from filename to only get digits
+        TS_VAL=$(echo $file | tr -d -c 0-9)
+        if [[ -z "${TS_VAL// }" ]]
+        then
+           WRITESTR="0" #first file doesnt append a ts...
+        else
+            WRITESTR="$TS_VAL"
+        fi
 
         # next extract data
         RAW_DATA=$(grep -i "Solution Vector" $file)

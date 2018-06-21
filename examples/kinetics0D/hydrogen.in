@@ -1,4 +1,3 @@
-
 # Solver Options
 [SolverOptions]
    [./TimeStepping]
@@ -34,8 +33,8 @@
    # Initial Conditions
     ic_ids = '0'
     ic_types = 'parsed'
-    ic_variables = 'Y_O:Y_O2:Y_H:Y_H2:Y_H2O:Y_OH:T'
-    ic_values = '{0.1}{0.1}{0.1}{0.1}{0.1}{0.5}{950}'
+    ic_variables = 'T:Y_O:Y_O2:Y_H:Y_H2:Y_H2O:Y_OH'
+    ic_values = '{950}{0.1}{0.1}{0.1}{0.1}{0.1}{0.5}'
 
 []
 
@@ -125,19 +124,19 @@
     print_qoi = 'true'
 []
 
-[Kinetics0D]
-  output_prefix = 'hydrogen'
-[]
-
-
-# Options for adaptivity
+# QoI options for Ignition Delay
 [QoI]
-  enabled_qois = 'parsed_interior'
+  enabled_qois = 'ignition_delay'
+  filename_prefix = 'hydrogen'
 
   # Sensitivity analysis
   #adjoint_sensitivity_parameters = 'Materials/Viscosity/mu'
   #forward_sensitivity_parameters = 'Materials/Viscosity/mu'
 
-  [./ParsedInterior]
-    qoi_functional = 'T'
+  [./IgnitionDelay]
+     material = 'HydrogenGas'
+
+     fuel_species = 'Y_H'
+     fuel_consumption = '0.2' # 20% of initial fuel used up
+
 []

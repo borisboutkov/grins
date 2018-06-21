@@ -34,7 +34,6 @@
 #include "grins/variable_warehouse.h"
 
 // libMesh
-#include "libmesh/fem_function_base.h"
 #include "libmesh/auto_ptr.h"
 
 #if GRINS_HAVE_ANTIOCH
@@ -55,7 +54,7 @@ namespace GRINS
     //! Constructor
     /*! Constructor takes GetPot object to read any input options associated
       with this QoI as well as a chemistry pointer */
-    IgnitionDelayQoI( const std::string& qoi_name, const std::shared_ptr<GRINS::AntiochChemistry> chem );
+    IgnitionDelayQoI( const GetPot & input, const std::string& qoi_name, const std::shared_ptr<GRINS::AntiochChemistry> chem );
 
     virtual ~IgnitionDelayQoI();
 
@@ -73,10 +72,11 @@ namespace GRINS
 
     virtual bool assemble_on_sides() const;
 
-    //! Initialize local variables
+    //! Initialize solution history info
     virtual void init( const GetPot& input,
                        const MultiphysicsSystem& system,
                        unsigned int qoi_num );
+
 
     //! Initialize context
     virtual void init_context( AssemblyContext& context );
@@ -103,15 +103,32 @@ namespace GRINS
     //! Index for the species of interest
     unsigned int _species_idx;
 
-    std::unique_ptr<libMesh::FEMFunctionBase<libMesh::Number> >
-    qoi_functional;
-
     //! Manual copy constructor due to the UniquePtr
     IgnitionDelayQoI(const IgnitionDelayQoI& original);
+
+    //! Read in solution history from output files. Save to internal struct
+    void read_solution_history( const GetPot& input, AssemblyContext& context );
+
+    //! Storage for solution history post processing
+    std::vector< std::vector<libMesh::Real> > _solution_history;
+
+    //! Where to read solution data from
+    std::string _filename_prefix;
+
+    //! Which species is the fuel
+    std::string _fuel_species;
+
+    //! Percetage of initial fuel consumed
+    std::string _fuel_consumption;
+
+    //! Number of timesteps in the simulation
+    unsigned int _n_timesteps;
 
   private:
     //! User never call default constructor.
     IgnitionDelayQoI();
+
+    GetPot _input;
 
   };
 

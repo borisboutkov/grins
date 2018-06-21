@@ -29,46 +29,50 @@
 #include "grins/multiphysics_sys.h"
 #include "grins/composite_qoi.h"
 
+// libMesh
 #include "libmesh/time_solver.h"
 #include "libmesh/numeric_vector.h"
 
 
 #if GRINS_HAVE_ANTIOCH
+#include "grins/ignition_delay_qoi.h"
 #include "grins/antioch_chemistry.h"
 #endif
 
 int main(int argc, char* argv[])
 {
 #if GRINS_HAVE_ANTIOCH
+
+  // Initialize runner for the simulation
   GRINS::Runner runner(argc,argv);
   runner.init();
 
   // Parse the input file
   const GetPot & input = runner.get_input_file();
 
-  // Files from which well read in solution data
-  std::string filename = input("Kinetics0D/output_prefix","");
-  if (filename == "")
-    libmesh_error_msg("ERROR: please specify an output file prefix for the 0D-kinetics example!");
-
+  // Get some objects well need (for convenience)
   GRINS::Simulation & sim = runner.get_simulation();
   GRINS::MultiphysicsSystem * system = sim.get_multiphysics_system();
 
+  // Run the simulation
   runner.run();
 
   // Now build a data structure of the solution to house their history
   //system->get_mesh().read("hydrogen.xda");
   //libMesh::out << "mesh read in!...." << std::endl;
 
+  // Assemble and print the QoI info
   GRINS::CompositeQoI * comp_qoi = libMesh::cast_ptr<GRINS::CompositeQoI*>(system->get_qoi());
+  GRINS::IgnitionDelayQoI & ig_qoi = libMesh::cast_ref<GRINS::IgnitionDelayQoI &>(comp_qoi->get_qoi(0));
+
   libMesh::QoISet qs;
   qs.add_index(0);
-  system->assemble_qoi(qs);
-  libMesh::Real qoi = sim.get_qoi_value(0);
+  //system->assemble_qoi(qs);
+  libMesh::Real qoi_value = sim.get_qoi_value(0);
 
   libMesh::out << "printing my qoi...." << std::endl;
   if (system->get_mesh().comm().rank() == 0)
-    std::cout <<std::fixed <<std::setprecision(16) <<qoi <<std::endl;
+    std::cout <<std::fixed <<std::setprecision(16) << qoi_value <<std::endl;
 
 #else
   libmesh_error_msg("ERROR: GRINS must be built with Antioch to use this Kinetics0D example. Please reconfigure your build to include the Antioch library.");
