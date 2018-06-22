@@ -55,7 +55,8 @@ echo "found header columns: $SPECIES_HEADER"
 # prepend header info to clean data csv file
 echo $SPECIES_HEADER >> $CWD/$OUTFILE
 
-rm $OUTFILE".xda"
+rm $FILEDIR".xda"
+
 NUMFILES=$( find . -maxdepth 1 -name "*.xda" | wc -l )
 echo
 echo "Beginning processing of $NUMFILES total files."
