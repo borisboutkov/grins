@@ -127,16 +127,18 @@
 # QoI options for Ignition Delay
 [QoI]
   enabled_qois = 'ignition_delay'
-  filename_prefix = 'hydrogen'
 
-  # Sensitivity analysis
-  #adjoint_sensitivity_parameters = 'Materials/Viscosity/mu'
-  #forward_sensitivity_parameters = 'Materials/Viscosity/mu'
+   [./IgnitionDelay]
 
-  [./IgnitionDelay]
      material = 'HydrogenGas'
 
+     filename_prefix = 'hydrogen'
+
+     #ignition_type = 'fuel_consumption'
+     #fuel_species = 'Y_H'
+     #fuel_consumption = '0.1' # 10% of initial fuel used up
+
+     ignition_type = 'species_concentration_rate'
      fuel_species = 'Y_OH'
-     fuel_consumption = '0.2' # 20% of initial fuel used up
 
 []

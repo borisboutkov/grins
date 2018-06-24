@@ -50,10 +50,8 @@ namespace GRINS
     // Time dependent part(s)
     virtual void element_time_derivative( bool compute_jacobian,
                                           AssemblyContext & context );
-
     virtual void mass_residual( bool compute_jacobian,
                                 AssemblyContext & context );
-
 
     // Sets temp variables to be time-evolving
     virtual void set_time_evolving_vars( libMesh::FEMSystem* system );
@@ -65,7 +63,9 @@ namespace GRINS
     const Mixture & gas_mixture() const;
 
     // Evaluate rho
-    libMesh::Real rho ( libMesh::Real T, libMesh::Real p0, std::vector<libMesh::Real> mass_fractions,
+    libMesh::Real rho ( libMesh::Real T,
+                        libMesh::Real p0,
+                        std::vector<libMesh::Real> mass_fractions,
                         std::vector<libMesh::Real> molecular_mass);
 
   protected:
@@ -79,30 +79,6 @@ namespace GRINS
     //! Index from registering this quantity
     unsigned int _n_species;
 
-    //! Index from registering this quantity. Each species will have it's own index.
-    std::vector<unsigned int> _species_viscosity;
-
-    //! Index from registering this quantity
-    unsigned int _mu_index;
-
-    //! Index from registering this quantity
-    unsigned int _k_index;
-
-    //! Index from registering this quantity
-    unsigned int _cp_index;
-
-    //! Index from registering this quantity. Each species will have it's own index.
-    std::vector<unsigned int> _mole_fractions_index;
-
-    //! Index from registering this quantity. Each species will have it's own index.
-    std::vector<unsigned int> _h_s_index;
-
-    //! Index from registering this quantity. Each species will have it's own index.
-    std::vector<unsigned int> _omega_dot_index;
-
-    //! Index from registering this quantity. Each species will have it's own index.
-    std::vector<unsigned int> _Ds_index;
-
     // Thermodynamic pressure (assumed constant)
     libMesh::Number _p0;
 
@@ -112,6 +88,7 @@ namespace GRINS
     // Read options from GetPot input file.
     void read_input_options( const GetPot& input );
 
+    // Dont call default constructor
     Kinetics0D();
 
   }; // class Kinetics0D

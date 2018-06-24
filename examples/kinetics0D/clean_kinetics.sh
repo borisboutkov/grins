@@ -142,8 +142,8 @@ echo "Warning: this overwrites old *.png data in $FILEDIR"
 echo
 cd $CWD/$FILEDIR
 rm -f *.png
-echo "Raw data preview:"
-cat clean_data.csv
+#echo "Raw data preview:"
+#cat clean_data.csv
 echo
 
 # pass in  timing type and filedir to use in plots

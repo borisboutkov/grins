@@ -58,20 +58,11 @@ namespace GRINS
       _input(input)
   {
 
-    // Parse input file for IgnitionDelay parameters
-    _filename_prefix = input("QoI/filename_prefix","");
-    if ( _filename_prefix == "" )
-      libmesh_error_msg("ERROR: Could not QoI/filename_prefix!");
-
-    if ( input.have_variable("QoI/IgnitionDelay/fuel_species") )
-      _fuel_species = input("QoI/IgnitionDelay/fuel_species", "None");
+    // Parse input file for general IgnitionDelay parameters
+    if( input.have_variable("QoI/IgnitionDelay/filename_prefix") )
+      _filename_prefix = input("QoI/IgnitionDelay/filename_prefix","None");
     else
-      libmesh_error_msg("ERROR: Could not QoI/IgnitionDelay/fuel_species!");
-
-    if ( input.have_variable("QoI/IgnitionDelay/fuel_consumption") )
-      _fuel_consumption = input("QoI/IgnitionDelay/fuel_consumption", 0.1);
-    else
-      libmesh_error_msg("ERROR: Could not find QoI/IgnitionDelay/fuel_consumption");
+      libmesh_error_msg("ERROR: Could not QoI/IgnitionDelay/filename_prefix!");
 
     if( input.have_variable("SolverOptions/TimeStepping/n_timesteps") )
         _n_timesteps = input("SolverOptions/TimeStepping/n_timesteps",0);
@@ -83,25 +74,38 @@ namespace GRINS
     else
       libmesh_error_msg("ERROR: Could not find valid entry for delta_t");
 
-  }
+    // Ignition delay type specific input
+    if( input.have_variable("QoI/IgnitionDelay/ignition_type") )
+      {
+        _ignition_type = input("QoI/IgnitionDelay/ignition_type","None");
 
-  /*
-  IgnitionDelayQoI::IgnitionDelayQoI( const IgnitionDelayQoI& original )
-    : QoIBase(original),
-      _chemistry(original._chemistry),
-      _T_var(original._T_var),
-      _Y_var(original._Y_var),
-      _T0(296), // [K]
-      _input(original._input),
-      _filename_prefix(original._filename_prefix),
-      _fuel_species(original._fuel_species),
-      _fuel_consumption(original._fuel_consumption),
-      _n_timesteps(original._n_timesteps),
-      _dt(original._dt)
-  {
-    // do what in the copy?
+        if ( _ignition_type == "fuel_consumption" )
+          {
+            if ( input.have_variable("QoI/IgnitionDelay/fuel_species") )
+              _fuel_species = input("QoI/IgnitionDelay/fuel_species", "None");
+            else
+              libmesh_error_msg("ERROR: Could not QoI/IgnitionDelay/fuel_species!");
+
+            if ( input.have_variable("QoI/IgnitionDelay/fuel_consumption") )
+              _fuel_consumption = input("QoI/IgnitionDelay/fuel_consumption", 0.1);
+            else
+              libmesh_error_msg("ERROR: Could not find QoI/IgnitionDelay/fuel_consumption");
+          }
+
+        else if ( _ignition_type == "species_concentration_rate" )
+          {
+            if ( input.have_variable("QoI/IgnitionDelay/fuel_species") )
+              _fuel_species = input("QoI/IgnitionDelay/fuel_species", "None");
+            else
+              libmesh_error_msg("ERROR: Could not find QoI/IgnitionDelay/fuel_species!");
+          }
+      }
+    else
+      libmesh_error_msg("ERROR: Could not find QoI/IgnitionDelay/ignition_type! Choose from : fuel_consumption, species_concentration_rate");
+
+
+
   }
-  */
 
   IgnitionDelayQoI::~IgnitionDelayQoI() {}
 
@@ -110,32 +114,19 @@ namespace GRINS
     return new IgnitionDelayQoI( *this );
   }
 
-
-  void IgnitionDelayQoI::init (const GetPot& input,
-                               const MultiphysicsSystem& system,
-                               unsigned int /*qoi_num*/ )
-  {
-    // do nothing?
-  }
-
-
- void IgnitionDelayQoI::parallel_op( const libMesh::Parallel::Communicator & communicator,
+  void IgnitionDelayQoI::parallel_op( const libMesh::Parallel::Communicator & communicator,
                                              libMesh::Number & sys_qoi,
                                              libMesh::Number & local_qoi )
   {
-    // for now do nothing. will need to max over all proc?
-
     communicator.max(local_qoi);
     sys_qoi = local_qoi;
     QoIBase::_qoi_value = sys_qoi;
-
   }
 
 
   void IgnitionDelayQoI::read_solution_history( const GetPot& input, AssemblyContext& context )
   {
     // Do the actual construction of the solution history
-
     libMesh::out << "reading solution history data..."<< std::endl;
     // libMesh cant read back in a 0-dim xda file... system calls for now!
     /*
@@ -173,19 +164,19 @@ namespace GRINS
       }
 
     // check we have what we want
+    /*
+    libMesh::out << "printing soln_history data..."<< std::endl;
+    libMesh::out << "of size: "<<_solution_history.size() << "x" << _solution_history[0].size() << std::endl;
 
-      libMesh::out << "printing soln_history data..."<< std::endl;
-      libMesh::out << "of size: "<<_solution_history.size() << "x" << _solution_history[0].size() << std::endl;
-
-      for (int i = 0; i < _solution_history.size(); i++)
-        {
-          for (int j = 0; j < _solution_history[i].size(); j++)
-            {
-              libMesh::out << _solution_history[i][j] << " ";
-            }
-          libMesh::out << std::endl;
-        }
-
+    for (int i = 0; i < _solution_history.size(); i++)
+      {
+        for (int j = 0; j < _solution_history[i].size(); j++)
+          {
+            libMesh::out << _solution_history[i][j] << " ";
+          }
+        libMesh::out << std::endl;
+      }
+    */
   }
 
   void IgnitionDelayQoI::init_context( AssemblyContext& context )
@@ -203,70 +194,49 @@ namespace GRINS
     /*! \todo Need to generalize this to the multiple QoI case */
     libMesh::Number& qoi = context.get_qois()[qoi_index];
 
-    libMesh::out << "qoi fuel comsumption value : " << _fuel_consumption << std::endl;
-
-    libMesh::out << "qoi fuel : " << _fuel_species << std::endl;
-
-    // +1 because we added timestep data to the clean_data file
+    // + 1 because we added timestep data to the clean_data file
     unsigned int fuel_var_num = context.get_system().variable_number( _fuel_species ) + 1 ;
 
-    libMesh::out << "qoi fuel var number : " << std::to_string(fuel_var_num) << std::endl;
-
-    int ts = 0;
+    // to extract the timestep
+    libMesh::Real ts = 0;
     libMesh::Real initial_fuel = _solution_history[0][fuel_var_num];
-    libMesh::out << "initial fuel amount : " << std::to_string(initial_fuel) << std::endl;
 
-
-    for (int i = 0 ; i < _solution_history.size(); ++i )
+    if ( this->_ignition_type == "fuel_consumption" )
       {
-        if (  _solution_history[i][fuel_var_num]  < (1 -_fuel_consumption) * initial_fuel )
+        // igntion delay = specified percentage of fuel is consumed
+        for (unsigned int i = 0 ; i < this->_solution_history.size(); ++i )
           {
-            ts = _solution_history[i][0];
-            libMesh::out << "IGNITION! Remaining fuel " << std::to_string(_solution_history[i][fuel_var_num]) << " at timestep " << ts << std::endl;
-            libMesh::out << "_dt  " <<  _dt << std::endl;
-            libMesh::out << "IGNITION QOI " <<  _dt*(double)ts << std::endl;
-            qoi = (double)ts*_dt;
-            return;
+            if (  this->_solution_history[i][fuel_var_num]  <
+                  (1 -_fuel_consumption) * initial_fuel )
+              {
+                ts = this->_solution_history[i][0];
+                qoi = ts*this->_dt;
+                return;
+              }
           }
       }
-  }
-
-  void IgnitionDelayQoI::element_qoi_derivative( AssemblyContext& context,
-                                                  const unsigned int qoi_index )
-  {
-    libMesh::DenseSubVector<libMesh::Number> & dQdT  = context.get_qoi_derivatives(qoi_index, _T_var.T());
-
-    std::vector<libMesh::Point> qp(1);
-    //qp[0] = qp_ref;
-
-    std::unique_ptr< libMesh::FEBase > T_fe = libMesh::FEGenericBase<libMesh::Real>::build(context.get_elem().dim(), context.get_element_fe(_T_var.T())->get_fe_type() );
-    const std::vector<std::vector<libMesh::Real> > & T_phi =T_fe->get_phi();
-    T_fe->reinit(&(context.get_elem()),&qp);
-
-    std::unique_ptr< libMesh::FEBase > Ys_fe = libMesh::FEGenericBase<libMesh::Real>::build(context.get_elem().dim(), context.get_element_fe(_Y_var.species(_species_idx))->get_fe_type() );
-    const std::vector<std::vector<libMesh::Real> > & Ys_phi = Ys_fe->get_phi();
-    Ys_fe->reinit(&(context.get_elem()),&qp);
-
-    libMesh::Real T; // temperature
-    std::vector<libMesh::Real> Y(_chemistry->n_species()); // mass fractions
-
-    context.point_value(_T_var.T(), qp[0], T); // [K]
-
-    // all mass fractions needed to get M_mix
-    for (unsigned int s=0; s<_chemistry->n_species(); s++)
-      context.point_value(_Y_var.species(s), qp[0], Y[s]);
-
-    // temperature derivatives
-    for (unsigned int j=0; j<dQdT.size(); j++)
-      dQdT(j) += T_phi[j][0];
-
-    // mass fraction deriv for all species
-    for (unsigned int s=0; s<Y.size(); ++s)
+    else if ( this->_ignition_type == "species_concentration_rate" )
       {
-        libMesh::DenseSubVector<libMesh::Number> & dQdYi = context.get_qoi_derivatives(qoi_index,_Y_var.species(s));
-        for (unsigned int j=0; j<dQdYi.size(); j++)
-          dQdYi(j) += Ys_phi[j][0];
+        // ignition delay =  species concentration rate maximum
+        // just do centered diff in time on the solution
+        std::vector<libMesh::Real> concentration_rate;
+        concentration_rate.resize(this->_solution_history.size() - 2);
+        for (unsigned int i = 1 ; i < _solution_history.size() - 1; i++ )
+          {
+            concentration_rate[i-1] = std::abs((this->_solution_history[i][fuel_var_num]
+                          - this->_solution_history[i-1][fuel_var_num]))  / (2*this->_dt);
+          }
+        // ts is max of the rate vec
+        auto maxrate = std::max_element(concentration_rate.begin(), concentration_rate.end());
+        auto dist = std::distance(concentration_rate.begin(), maxrate);
+        ts = this->_solution_history[dist][0];
+        qoi = (ts+_dt/2)*this->_dt;
       }
-  }
+    else
+      {
+        libmesh_error_msg("ERROR: QoI/IgnitionDelay/ignition_type not understood!");
+      }
+
+  } //end element_qoi
 
 } //namespace GRINS

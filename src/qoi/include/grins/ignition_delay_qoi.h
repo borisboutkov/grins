@@ -72,12 +72,6 @@ namespace GRINS
 
     virtual bool assemble_on_sides() const;
 
-    //! Initialize solution history info
-    virtual void init( const GetPot& input,
-                       const MultiphysicsSystem& system,
-                       unsigned int qoi_num );
-
-
     //! Initialize context
     virtual void init_context( AssemblyContext& context );
 
@@ -85,9 +79,6 @@ namespace GRINS
     virtual void element_qoi( AssemblyContext& context,
                               const unsigned int qoi_index );
 
-    //! Compute the qoi derivative with respect to the solution.
-    virtual void element_qoi_derivative( AssemblyContext& context,
-                                         const unsigned int qoi_index );
 
   protected:
 
@@ -99,12 +90,6 @@ namespace GRINS
 
     //! Reference temperature [K]
     libMesh::Real _T0;
-
-    //! Index for the species of interest
-    unsigned int _species_idx;
-
-    //! Manual copy constructor due to the UniquePtr
-    //IgnitionDelayQoI(const IgnitionDelayQoI& original);
 
     //! Read in solution history from output files. Save to internal struct
     void read_solution_history( const GetPot& input, AssemblyContext& context );
@@ -118,6 +103,9 @@ namespace GRINS
     //! Which species is the fuel
     std::string _fuel_species;
 
+    //! Ignition type
+    std::string _ignition_type;
+
     //! Percetage of initial fuel consumed
     libMesh::Real  _fuel_consumption;
 
@@ -128,7 +116,8 @@ namespace GRINS
     libMesh::Real _dt;
 
   private:
-    //! User never call default constructor.
+
+    //! Never call default constructor.
     IgnitionDelayQoI();
 
     GetPot _input;
