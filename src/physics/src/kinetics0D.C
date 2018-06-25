@@ -164,6 +164,7 @@ namespace GRINS
 
         rho_antioch = _p0/(R_mix[qp] * T[qp]);
 
+
         // these are equal
         //libMesh::out <<"rho mine ... " << rho  << std::endl;
         //libMesh::out <<"rho his  ... " << rho_antioch  << std::endl;
@@ -185,10 +186,11 @@ namespace GRINS
             wdotsum += omega_dot[qp][s];
             massfrac_sum += mass_fractions[qp][s];
           }
-        /*
+
         {
-        libMesh::out <<"temp ... " << T  << std::endl;
+        libMesh::out <<"temp ... " << T[qp]  << std::endl;
         libMesh::out <<"rho " << rho  << std::endl;
+        libMesh::out <<"_p0 " << _p0  << std::endl;
 
         libMesh::out << "h_s: ";
         for (auto i = h_s[0].begin(); i != h_s[0].end(); ++i)
@@ -212,12 +214,10 @@ namespace GRINS
         libMesh::out << std::endl;
 
         libMesh::out<< "hsum: " << hsum << std::endl;
-        libMesh::out<< "hwsum: " << hwsum << std::endl;
         libMesh::out<< "hwmsum: " << hwmsum << std::endl;
-        libMesh::out<< "Xcpsum: " << xcsum << std::endl;
         libMesh::out<< "omega_dot sum: " << wdotsum << std::endl;
         }
-        */
+
 
         // Temperature residual
         for (unsigned int i = 0; i != n_T_dofs; ++i)
@@ -246,6 +246,9 @@ namespace GRINS
   void Kinetics0D<Mixture,Evaluator>::mass_residual
   ( bool compute_jacobian, AssemblyContext & context )
   {
+
+    if (compute_jacobian )
+      libmesh_not_implemented();
 
     const unsigned int n_T_dofs = context.get_dof_indices(this->_temp_vars.T()).size();
     const VariableIndex s0_var = this->_species_vars.species(0);

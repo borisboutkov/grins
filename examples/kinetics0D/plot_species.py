@@ -26,26 +26,25 @@ print
 print "Header data successfully extracted from logs!"
 print header
 
-# sort the data by the first (timestep) column
-data = data[data[:,0].argsort()]
-#print data
-
 # convenience for basic plots
 n_species = len(data[0,:])
 print "plotting data for Temp plus " + str(n_species - 2) + " species"
 
 timestep   = data[:,0]
 
-# basic np vs total time
 fig, ax1 = plt.subplots()
 
 ax1.set_xlabel('Timestep')
+ax1.ticklabel_format(useOffset=False) # dont use +1e3 for temps
 ax1.plot(timestep , data[:,1], 'r' , label="Temp")
 ax1.set_ylabel('Temperature', color='r')
 ax1.tick_params('y', colors='r')
 
+
 ax2 = ax1.twinx()
 ax2.set_ylabel("Species Mass Fraction")
+ax2.set_ylim([0,1])
+
 #ax2.tick_params('y')
 for i in range(2, n_species):
     ax2.plot(timestep,data[:,i], label=str(header[i]))
