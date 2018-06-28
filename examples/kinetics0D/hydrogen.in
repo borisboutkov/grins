@@ -33,8 +33,8 @@
    # Initial Conditions
     ic_ids = '0'
     ic_types = 'parsed'
-    ic_variables = 'T:Y_OH:Y_O2:Y_H2:Y_H:Y_O:Y_H2O'
-    ic_values = '{1050}{0.01}{0.34}{0.659}{0.0}{0.0}{0.0}'
+    ic_variables = 'T:Y_OH:Y_O2:Y_H2:Y_H:Y_O:Y_H2O:Y_Ar'
+    ic_values = '{1050}{0.0}{0.15}{0.18}{0.01}{0.0}{0.0}{0.66}'
 
 []
 
@@ -47,20 +47,20 @@
 [Materials]
   [./HydrogenGas]
      [./ThermodynamicPressure]
-        value = '354637.5' #[Pa] = #3.5 atm
-        #value =  '1e5' #[Pa] = #3.5 atm
+        #value = '354637.5' #[Pa] = #3.5 atm
+        value =  '1e5' #[Pa] = #3.5 atm
      [../GasMixture]
         thermochemistry_library = 'antioch'
-        species = 'OH O2 H2 H O H2O'
-        kinetics_data = 'hydrogen.xml'
-        #kinetics_data = 'grimech30.xml'
+        species = 'OH O2 H2 H O H2O Ar'
+        #kinetics_data = 'hydrogen.xml'
+        kinetics_data = 'grimech30.xml'
 
         [./Antioch]
            thermo_model = 'cea'
-           cea_data = 'hydrogen_cea_data.dat'
-           #cea_data = 'grimech30_thermo.dat'
-           #species_data = 'grimech30_species_data.dat'
-           species_data = 'hydrogen_species_data.dat'
+           #cea_data = 'hydrogen_cea_data.dat'
+           cea_data = 'grimech30_thermo.dat'
+           species_data = 'default'
+           #species_data = 'hydrogen_species_data.dat'
 
            # satisfy some requests for things we dont need
            viscosity_model = 'constant'

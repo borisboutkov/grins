@@ -124,15 +124,21 @@
     print_qoi = 'true'
 []
 
-# Options for adaptivity
+# QoI options for Ignition Delay
 [QoI]
-  enabled_qois = 'parsed_interior'
+  enabled_qois = 'ignition_delay'
 
-# Sensitivity analysis
-#adjoint_sensitivity_parameters = 'Materials/Viscosity/mu'
-#forward_sensitivity_parameters = 'Materials/Viscosity/mu'
+   [./IgnitionDelay]
 
-[./ParsedInterior]
-  qoi_functional = 'T'
+     material = 'OzoneGas'
+
+     filename_prefix = 'ozone'
+
+     ignition_type = 'fuel_consumption'
+     fuel_species = 'Y_O3'
+     fuel_consumption = '0.1' # 10% of initial fuel used up
+
+     #ignition_type = 'species_concentration_rate'
+     #fuel_species = 'Y_OH'
 
 []

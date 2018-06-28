@@ -34,8 +34,8 @@
    # Initial Conditions
     ic_ids = '0'
     ic_types = 'parsed'
-    ic_variables = 'Y_O:Y_O2:Y_H:Y_H2:Y_H2O:Y_OH:T'
-    ic_values = '{0.1}{0.1}{0.1}{0.1}{0.1}{0.5}{950}'
+    ic_variables = 'T:Y_CH4:Y_H2:Y_O2:Y_H2O:Y_OH::Y_AR'
+    ic_values = '{1050}{0.01}{0.0}{0.04}{0.0}{0.01}{0.94}'
 
 []
 
@@ -51,7 +51,7 @@
         value = '1e5' #[Pa]
      [../GasMixture]
         thermochemistry_library = 'antioch'
-        species = 'O O2 H H2 H2O OH'
+        species = 'CH4 H2 O2 H2O OH AR'
         kinetics_data = 'grimech30.xml'
 
         [./Antioch]
@@ -125,13 +125,19 @@
 
 # Options for adaptivity
 [QoI]
-  enabled_qois = 'parsed_interior'
+  enabled_qois = 'ignition_delay'
 
-# Sensitivity analysis
-#adjoint_sensitivity_parameters = 'Materials/Viscosity/mu'
-#forward_sensitivity_parameters = 'Materials/Viscosity/mu'
+   [./IgnitionDelay]
 
-[./ParsedInterior]
-  qoi_functional = 'T'
+     material = 'GriMech30Gas'
+
+     filename_prefix = 'grimech30'
+
+     #ignition_type = 'fuel_consumption'
+     #fuel_species = 'Y_H'
+     #fuel_consumption = '0.1' # 10% of initial fuel used up
+
+     ignition_type = 'species_concentration_rate'
+     fuel_species = 'Y_OH'
 
 []

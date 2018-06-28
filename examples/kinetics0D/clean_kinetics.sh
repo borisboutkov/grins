@@ -89,7 +89,7 @@ do
 
         # first extract the time_step from filename
         # strip all nonintegers from filename to only get digits
-        TS_VAL=$(echo $file | tr -d -c 0-9)
+        TS_VAL=$(echo $file | cut -d "." -f2)
         if [[ -z "${TS_VAL// }" ]]
         then
            WRITESTR="0" #first file doesnt append a ts...
