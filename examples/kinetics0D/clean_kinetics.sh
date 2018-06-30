@@ -52,6 +52,12 @@ SPECIES_HEADER="TS Temp $SPECIES_CLEAN"
 
 echo "found header columns: $SPECIES_HEADER"
 
+
+DELTA_T_STR=$( grep -i "delta_t = " $INPUTFILE)
+#split on the single quote, take field 2
+DELTA_T=$( echo $DELTA_T_STR | cut -d "'" -f2  )
+echo "dt:" $DELTA_T
+
 # prepend header info to clean data csv file
 echo $SPECIES_HEADER >> $CWD/$OUTFILE
 
@@ -65,13 +71,13 @@ find . -maxdepth 1 -name "*.xda"  -exec mv -t $FILEDIR {} +
 
 cd $FILEDIR
 
-
 # prepend header info to clean data csv file
 echo $HEADERSTR >> $CWD/$OUTFILE
 
 # use a counter to ensure each file gets hit.
 proccessed_count=0
 
+#'alphabetize' by the timestep counter
 for file in $(find . -name '*.xda' | ls -v *.xda)
 do
     # Make sure we have files to work on ...
@@ -146,8 +152,8 @@ rm -f *.png
 #cat clean_data.csv
 echo
 
-# pass in  timing type and filedir to use in plots
-python $CWD/plot_species.py clean_data.csv $FILEDIR
+# pass in timing type, filedir and delta_t to use in plots
+python $CWD/plot_species.py clean_data.csv $FILEDIR $DELTA_T
 
 echo "Plotting complete. Plots located at $CWD/$FILEDIR Exiting."
 echo
