@@ -29,7 +29,8 @@ print "Header data successfully extracted from logs!"
 print header
 
 # no need to plot nonreacting species
-species_dilutants = ["Ar", "AR"]
+species_dilutants = ["Ar", "AR", "H2", "O2", "H2O"]
+#species_dilutants = ["Ar", "AR"]
 exclude_species_idx = [0,1]; #also exclude time,Temperature data
 for h in header:
     for sd in species_dilutants:
@@ -49,7 +50,8 @@ fig, ax1 = plt.subplots()
 
 # plot the Temperature. assume its always at column 1
 ax1.set_xlabel('Time')
-ax1.ticklabel_format(useOffset=False) # dont use +1e3 for temps
+ax1.ticklabel_format(style='sci', axis='x', scilimits=(0,0))
+#ax1.ticklabel_format(useOffset=False) # dont use +1e3 for temps
 ax1.plot(time, data[:,1] , 'r' , label="Temp")
 ax1.set_ylabel('Temperature', color='r')
 ax1.tick_params('y', colors='r')

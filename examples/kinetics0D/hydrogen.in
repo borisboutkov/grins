@@ -2,7 +2,7 @@
 [SolverOptions]
    [./TimeStepping]
       solver_type = 'libmesh_euler_solver'
-      delta_t = '1.0e-7'
+      delta_t = '1.0e-8'
       n_timesteps = '300'
       theta = '1'
    []
@@ -19,14 +19,14 @@
 
    use_numerical_jacobians_only = 'true'
 
-  absolute_residual_tolerance = '1.0e-2'
-#  relative_residual_tolerance = '0'
+   absolute_residual_tolerance = '1.0e-2'
+   #relative_residual_tolerance = '0'
    relative_step_tolerance = '1.0e-8'
 []
 
 # Enabled Physics classes
 [Physics]
-   enabled_physics = 'Kinetics0D'
+     enabled_physics = 'Kinetics0D'
    [./Kinetics0D]
     material = 'HydrogenGas'
 
@@ -34,7 +34,7 @@
     ic_ids = '0'
     ic_types = 'parsed'
     ic_variables = 'T:Y_OH:Y_O2:Y_H2:Y_H:Y_O:Y_H2O:Y_Ar'
-    ic_values = '{1050}{0.0}{0.15}{0.18}{0.01}{0.0}{0.0}{0.66}'
+    ic_values = '{3550}{0.0}{0.15}{0.18}{0.0}{0.0}{0.0}{0.67}'
 
 []
 
