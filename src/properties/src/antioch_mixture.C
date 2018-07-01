@@ -94,6 +94,9 @@ namespace GRINS
     _reaction_set.reset( reaction_set.release() );
     _nasa_mixture.reset( nasa_mixture.release() );
 
+    std::cout << "\nprinting reaction set data: " << std::endl;
+    this->_reaction_set->print();
+
     this->build_stat_mech_ref_correction();
   }
 

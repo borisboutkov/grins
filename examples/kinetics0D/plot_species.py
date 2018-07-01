@@ -29,8 +29,8 @@ print "Header data successfully extracted from logs!"
 print header
 
 # no need to plot nonreacting species
-species_dilutants = ["Ar", "AR", "H2", "O2", "H2O"]
-#species_dilutants = ["Ar", "AR"]
+#species_dilutants = ["Ar", "AR", "H2", "O2", "H2O"]
+species_dilutants = ["Ar", "AR"]
 exclude_species_idx = [0,1]; #also exclude time,Temperature data
 for h in header:
     for sd in species_dilutants:
