@@ -52,7 +52,7 @@ fig, ax1 = plt.subplots()
 ax1.set_xlabel('Time')
 ax1.ticklabel_format(style='sci', axis='x', scilimits=(0,0))
 #ax1.ticklabel_format(useOffset=False) # dont use +1e3 for temps
-ax1.plot(time, data[:,1] , 'r' , label="Temp")
+ax1.plot(time, data[:,1] , 'r--' , label="Temp")
 ax1.set_ylabel('Temperature', color='r')
 ax1.tick_params('y', colors='r')
 

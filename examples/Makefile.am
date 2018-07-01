@@ -89,8 +89,7 @@ kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/thermo30.dat
 kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/grimech30_species_data.dat
 kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/grimech30_thermo.dat
 kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/grimech30.in
-
-
+kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/grimech30_h2o2.in
 #General
 kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/plot_species.py
 kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/clean_kinetics.sh

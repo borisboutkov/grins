@@ -48,7 +48,7 @@
   [./HydrogenGas]
      [./ThermodynamicPressure]
         #value = '354637.5' #[Pa] = #3.5 atm
-        value =  '1e5' #[Pa] = #3.5 atm
+        value =  '5e5' #[Pa]
      [../GasMixture]
         thermochemistry_library = 'antioch'
         species = 'OH O2 H2 H O H2O Ar'
@@ -56,6 +56,7 @@
         kinetics_data = 'grimech30.xml'
 
         [./Antioch]
+           verbose_read = 'true'
            thermo_model = 'cea'
            #cea_data = 'hydrogen_cea_data.dat'
            cea_data = 'grimech30_thermo.dat'

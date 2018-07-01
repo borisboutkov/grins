@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
   runner.init();
 
   // Parse the input file
-  const GetPot & input = runner.get_input_file();
+  // const GetPot & input = runner.get_input_file();
 
   // Get some objects well need (for convenience)
   GRINS::Simulation & sim = runner.get_simulation();
@@ -63,7 +63,7 @@ int main(int argc, char* argv[])
 
   // Assemble and print the QoI info
   GRINS::CompositeQoI * comp_qoi = libMesh::cast_ptr<GRINS::CompositeQoI*>(system->get_qoi());
-  GRINS::IgnitionDelayQoI & ig_qoi = libMesh::cast_ref<GRINS::IgnitionDelayQoI &>(comp_qoi->get_qoi(0));
+  // GRINS::IgnitionDelayQoI & ig_qoi = libMesh::cast_ref<GRINS::IgnitionDelayQoI &>(comp_qoi->get_qoi(0));
 
   libMesh::QoISet qs;
   qs.add_index(0);
