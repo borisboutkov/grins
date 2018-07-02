@@ -1,9 +1,10 @@
+
 # Solver Options
 [SolverOptions]
    [./TimeStepping]
       solver_type = 'libmesh_euler_solver'
       delta_t = '1.0e-9'
-      n_timesteps = '20500'
+      n_timesteps = '300'
       theta = '1'
    []
 []
@@ -19,22 +20,22 @@
 
    use_numerical_jacobians_only = 'true'
 
-   absolute_residual_tolerance = '1.0e-2'
-   #relative_residual_tolerance = '0'
+  absolute_residual_tolerance = '1.0e-2'
+#  relative_residual_tolerance = '0'
    relative_step_tolerance = '1.0e-8'
 []
 
 # Enabled Physics classes
 [Physics]
-     enabled_physics = 'Kinetics0D'
+   enabled_physics = 'Kinetics0D'
    [./Kinetics0D]
-    material = 'HydrogenGas'
+    material = 'GriMech30Gas'
 
    # Initial Conditions
     ic_ids = '0'
     ic_types = 'parsed'
-    ic_variables = 'T:Y_H2:Y_H:Y_O:Y_O2:Y_OH:Y_H2O:Y_HO2:Y_H2O2:Y_Ar'
-    ic_values = '{1250}{0.15}{0.0}{0.0}{0.18}{0.0}{0.0}{0.0}{0.0}{0.67}'
+    ic_variables = 'T:Y_H2:Y_H:Y_O:Y_O2:Y_OH:Y_H2O:Y_HO2:Y_H2O2:Y_C:Y_CH:Y_CH2:Y_CH2(S):Y_CH3:Y_CH4:Y_CO:Y_CO2:Y_HCO:Y_CH2O:Y_CH2OH:Y_CH3O:Y_CH3OH:Y_C2H:Y_C2H2:Y_C2H3:Y_C2H4:Y_C2H5:Y_C2H6:Y_HCCO:Y_CH2CO:Y_HCCOH:Y_N:Y_NH:Y_NH2:Y_NH3:Y_NNH:Y_NO:Y_NO2:Y_N2O:Y_HNO:Y_CN:Y_HCN:Y_H2CN:Y_HCNN:Y_HCNO:Y_HOCN:Y_HNCO:Y_NCO:Y_N2:Y_AR:Y_C3H7:Y_C3H8:Y_CH2CHO:Y_CH3CHO'
+    ic_values = '{1050}{0.06}{0.0}{0.0}{0.04}{0.0}{0.0}{0.0}{0.0}{0.0}{0.0}{0.0}{0.0}{0.0}{0.0}{0.0}{0.0}{0.0}{0.0}{0.0}{0.0}{0.0}{0.0}{0.0}{0.0}{0.0}{0.0}{0.0}{0.0}{0.0}{0.0}{0.0}{0.0}{0.0}{0.0}{0.0}{0.0}{0.0}{0.0}{0.0}{0.0}{0.0}{0.0}{0.0}{0.0}{0.0}{0.0}{0.0}{0.0}{0.9}{0.0}{0.0}{0.0}{0.0}'
 
 []
 
@@ -45,32 +46,25 @@
 []
 
 [Materials]
-  [./HydrogenGas]
+  [./GriMech30Gas]
      [./ThermodynamicPressure]
-        #value = '354637.5' #[Pa] = #3.5 atm
-        value =  '5e5' #[Pa]
+        value = '1e5' #[Pa]
      [../GasMixture]
-        thermochemistry_library = 'antioch'
-        species = 'H2 H O O2 OH H2O HO2 H2O2 Ar'
-        kinetics_data = 'hydrogen.xml'
+        thermochemistry_library = 'cantera'
+        species = 'H2  H  O  O2  OH  H2O  HO2  H2O2  C  CH
+      CH2  CH2(S)  CH3  CH4  CO  CO2  HCO  CH2O  CH2OH  CH3O
+      CH3OH  C2H  C2H2  C2H3  C2H4  C2H5  C2H6  HCCO  CH2CO  HCCOH
+      N  NH  NH2  NH3  NNH  NO  NO2  N2O  HNO  CN
+      HCN  H2CN  HCNN  HCNO  HOCN  HNCO  NCO  N2  AR  C3H7
+      C3H8 CH2CHO  CH3CHO'
 
-        [./Antioch]
+      kinetics_data = 'gri30.xml'
+
+        [./Cantera]
            verbose_read = 'true'
-           thermo_model = 'cea'
-           #cea_data = 'hydrogen_cea_data.dat'
-           #cea_data = 'grimech30_thermo.dat'
-           species_data = 'default'
-           #species_data = 'hydrogen_species_data.dat'
+           gas_mixture = 'gri30'
 
-           # satisfy some requests for things we dont need
-           viscosity_model = 'constant'
-           thermal_conductivity_model = 'constant'
-           mass_diffusivity_model = 'constant_lewis'
-           transport_model = 'constant'
-           vibration_data = 'default'
-           electronic_data = 'default'
-
-     [../../Viscosity]
+   [../../Viscosity]
         value = '1.0'
      [../ThermalConductivity]
         value = '1.0'
@@ -93,13 +87,13 @@
       names = 'Y_'
       fe_family = 'LAGRANGE'
       order = 'FIRST'
-      material = 'HydrogenGas'
+      material = 'GriMech30Gas'
 []
 
 # Visualization options
 [vis-options]
    output_vis = 'true'
-   vis_output_file_prefix = 'hydrogen'
+   vis_output_file_prefix = 'grimech30'
    output_residual = 'false'
    output_format = 'xda'
 []
@@ -107,7 +101,7 @@
 # Options for print info to the screen
 [screen-options]
 
-   system_name = 'kinetics0D_hydrogen'
+   system_name = 'kinetics0D_grimech30'
 
    print_equation_system_info = 'true'
    print_mesh_info = 'true'
@@ -119,24 +113,22 @@
 
    echo_physics = 'true'
    echo_qoi = 'true' # which QoIs activated
-
 []
-
 
 [Output]
   [./Display]
     print_qoi = 'true'
 []
 
-# QoI options for Ignition Delay
+# Options for adaptivity
 [QoI]
   enabled_qois = 'ignition_delay'
 
    [./IgnitionDelay]
 
-     material = 'HydrogenGas'
+     material = 'GriMech30Gas'
 
-     filename_prefix = 'hydrogen'
+     filename_prefix = 'grimech30'
 
      #ignition_type = 'fuel_consumption'
      #fuel_species = 'Y_H'

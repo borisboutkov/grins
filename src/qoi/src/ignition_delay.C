@@ -144,7 +144,7 @@ namespace GRINS
     std::string clean_data_command = "./clean_kinetics.sh " + _filename_prefix + " " + _filename_prefix+ ".in";
     std::system(clean_data_command.c_str());
 
-    // Read the generated csv into a _solution_history
+    // Read the generated csv into _solution_history
     std::ifstream data("./" + _filename_prefix + "/clean_data.csv");
 
     int row = 0;

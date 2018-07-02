@@ -3,7 +3,7 @@
    [./TimeStepping]
       solver_type = 'libmesh_euler_solver'
       delta_t = '1.0e-9'
-      n_timesteps = '20500'
+      n_timesteps = '20000'
       theta = '1'
    []
 []
@@ -50,25 +50,13 @@
         #value = '354637.5' #[Pa] = #3.5 atm
         value =  '5e5' #[Pa]
      [../GasMixture]
-        thermochemistry_library = 'antioch'
-        species = 'H2 H O O2 OH H2O HO2 H2O2 Ar'
+        thermochemistry_library = 'cantera'
+
         kinetics_data = 'hydrogen.xml'
 
-        [./Antioch]
+        [./Cantera]
            verbose_read = 'true'
-           thermo_model = 'cea'
-           #cea_data = 'hydrogen_cea_data.dat'
-           #cea_data = 'grimech30_thermo.dat'
-           species_data = 'default'
-           #species_data = 'hydrogen_species_data.dat'
-
-           # satisfy some requests for things we dont need
-           viscosity_model = 'constant'
-           thermal_conductivity_model = 'constant'
-           mass_diffusivity_model = 'constant_lewis'
-           transport_model = 'constant'
-           vibration_data = 'default'
-           electronic_data = 'default'
+           gas_mixture = 'gri30'
 
      [../../Viscosity]
         value = '1.0'
@@ -99,7 +87,7 @@
 # Visualization options
 [vis-options]
    output_vis = 'true'
-   vis_output_file_prefix = 'hydrogen'
+   vis_output_file_prefix = 'hydrogen_cantera'
    output_residual = 'false'
    output_format = 'xda'
 []
@@ -136,7 +124,7 @@
 
      material = 'HydrogenGas'
 
-     filename_prefix = 'hydrogen'
+     filename_prefix = 'hydrogen_cantera'
 
      #ignition_type = 'fuel_consumption'
      #fuel_species = 'Y_H'

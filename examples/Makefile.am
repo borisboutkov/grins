@@ -82,18 +82,26 @@ kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/hydrogen.xml
 kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/hydrogen_cea_data.dat
 kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/hydrogen_species_data.dat
 kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/hydrogen.in
+kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/hydrogen_cantera.in
 #GRI_Mech3
-kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/grimech30.xml
+kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/gri30.xml
 kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/grimech30.dat
 kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/thermo30.dat
 kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/grimech30_species_data.dat
 kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/grimech30_thermo.dat
 kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/grimech30.in
-kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/grimech30_h2o2.in
+kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/grimech30_cantera.in
 #General
 kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/plot_species.py
 kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/clean_kinetics.sh
-kinetics0D_SCRIPTS = $(top_builddir)/examples/kinetics0D/run.sh
+kinetics0D_SCRIPTS = $(top_builddir)/examples/kinetics0D/run_o.sh
+kinetics0D_SCRIPTS += $(top_builddir)/examples/kinetics0D/run_h.sh
+kinetics0D_SCRIPTS += $(top_builddir)/examples/kinetics0D/run_g.sh
+kinetics0D_SCRIPTS += $(top_builddir)/examples/kinetics0D/run_gh.sh
+#cantera versions
+kinetics0D_SCRIPTS += $(top_builddir)/examples/kinetics0D/run_oc.sh
+kinetics0D_SCRIPTS += $(top_builddir)/examples/kinetics0D/run_hc.sh
+kinetics0D_SCRIPTS += $(top_builddir)/examples/kinetics0D/run_gc.sh
 kinetics0D_SCRIPTS += $(top_builddir)/examples/kinetics0D/clean_kinetics.sh
 
 kinetics_SOURCES = kinetics0D/kinetics.C
