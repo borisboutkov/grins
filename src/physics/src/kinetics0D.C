@@ -187,6 +187,7 @@ namespace GRINS
             massfrac_sum += mass_fractions[qp][s];
           }
 
+        /*
         {
         libMesh::out <<"temp ... " << T[qp]  << std::endl;
         libMesh::out <<"rho " << rho  << std::endl;
@@ -217,7 +218,7 @@ namespace GRINS
         libMesh::out<< "hwmsum: " << hwmsum << std::endl;
         libMesh::out<< "omega_dot sum: " << wdotsum << std::endl;
         }
-
+        */
 
         // Temperature residual
         for (unsigned int i = 0; i != n_T_dofs; ++i)

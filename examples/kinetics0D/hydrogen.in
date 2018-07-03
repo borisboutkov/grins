@@ -47,8 +47,7 @@
 [Materials]
   [./HydrogenGas]
      [./ThermodynamicPressure]
-        #value = '354637.5' #[Pa] = #3.5 atm
-        value =  '5e5' #[Pa]
+        value =  '1e6' #[Pa]
      [../GasMixture]
         thermochemistry_library = 'antioch'
         species = 'H2 H O O2 OH H2O HO2 H2O2 Ar'
