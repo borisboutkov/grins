@@ -46,7 +46,7 @@ fi
 INPUTFILE=$2
 
 # quite flexible :)
-SPECIES_STR=$( grep -i "species = " $INPUTFILE | head -1 | cut -c 20- )
+SPECIES_STR=$( grep -m 1 -i "species = " $INPUTFILE | cut -c 20- )
 SPECIES_CLEAN=$( echo $SPECIES_STR | sed 's/.$//' )
 SPECIES_HEADER="TS Temp $SPECIES_CLEAN"
 

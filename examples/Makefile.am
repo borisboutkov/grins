@@ -94,14 +94,7 @@ kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/grimech30_cantera.in
 #General
 kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/plot_species.py
 kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/clean_kinetics.sh
-kinetics0D_SCRIPTS = $(top_builddir)/examples/kinetics0D/run_o.sh
-kinetics0D_SCRIPTS += $(top_builddir)/examples/kinetics0D/run_h.sh
-kinetics0D_SCRIPTS += $(top_builddir)/examples/kinetics0D/run_g.sh
-kinetics0D_SCRIPTS += $(top_builddir)/examples/kinetics0D/run_gh.sh
-#cantera versions
-kinetics0D_SCRIPTS += $(top_builddir)/examples/kinetics0D/run_oc.sh
-kinetics0D_SCRIPTS += $(top_builddir)/examples/kinetics0D/run_hc.sh
-kinetics0D_SCRIPTS += $(top_builddir)/examples/kinetics0D/run_gc.sh
+kinetics0D_SCRIPTS = $(top_builddir)/examples/kinetics0D/run.sh
 kinetics0D_SCRIPTS += $(top_builddir)/examples/kinetics0D/clean_kinetics.sh
 
 kinetics_SOURCES = kinetics0D/kinetics.C

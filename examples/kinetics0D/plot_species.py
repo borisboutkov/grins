@@ -31,15 +31,17 @@ print header
 # no need to plot nonreacting species
 #species_dilutants = ["Ar", "AR", "H2", "O2", "H2O"]
 species_dilutants = ["Ar", "AR"]
+require_species = ["O2", "OH", "H2","CH4"]
 exclude_species_idx = [0,1]; #also exclude time,Temperature data
 for h in header:
     for sd in species_dilutants:
         if ( h == sd ):
             i, = np.where( header == h )
             exclude_species_idx.extend(i)
+
 #print "Excluding from species data: " + str(header[exclude_species_idx])
 all_indicies = [i for i in xrange(header.size)]
-ind = [x for x in all_indicies if (x not in exclude_species_idx)]
+ind = [x for x in all_indicies if (x not in exclude_species_idx and x in require_species)]
 print "plotting species: " + str(header[ind])
 
 #get the time data
