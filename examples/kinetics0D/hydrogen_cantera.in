@@ -50,7 +50,7 @@
        value =  '1e6' #[Pa]
      [../GasMixture]
         thermochemistry_library = 'cantera'
-
+        species = 'H2 H O O2 OH H2O HO2 H2O2 Ar'
         kinetics_data = 'hydrogen.xml'
 
         [./Cantera]
