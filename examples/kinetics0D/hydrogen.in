@@ -3,7 +3,7 @@
    [./TimeStepping]
       solver_type = 'libmesh_euler_solver'
       delta_t = '1.0e-9'
-      n_timesteps = '20500'
+      n_timesteps = '30000'
       theta = '1'
    []
 []
@@ -34,7 +34,7 @@
     ic_ids = '0'
     ic_types = 'parsed'
     ic_variables = 'T:Y_H2:Y_H:Y_O:Y_O2:Y_OH:Y_H2O:Y_HO2:Y_H2O2:Y_Ar'
-    ic_values = '{1250}{0.15}{0.0}{0.0}{0.18}{0.0}{0.0}{0.0}{0.0}{0.67}'
+    ic_values = '{1250}{0.15}{0.0}{0.0}{0.15}{0.0}{0.0}{0.0}{0.0}{0.7}'
 
 []
 
@@ -58,7 +58,7 @@
            thermo_model = 'cea'
            #cea_data = 'hydrogen_cea_data.dat'
            #cea_data = 'grimech30_thermo.dat'
-           species_data = 'default'
+           #species_data = 'default'
            #species_data = 'hydrogen_species_data.dat'
 
            # satisfy some requests for things we dont need
