@@ -79,6 +79,7 @@ kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/ozone_species_data.dat
 kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/ozone.in
 #Hydrogen
 kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/hydrogen.xml
+kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/hydrogen_nasa7.xml
 kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/hydrogen_cea_data.dat
 kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/hydrogen_species_data.dat
 kinetics0D_DATA += $(top_srcdir)/examples/kinetics0D/hydrogen.in
