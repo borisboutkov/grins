@@ -3,7 +3,7 @@
    [./TimeStepping]
       solver_type = 'libmesh_euler_solver'
       delta_t = '1.0e-9'
-      n_timesteps = '30000'
+      n_timesteps = '25202'
       theta = '1'
    []
 []
@@ -51,7 +51,7 @@
      [../GasMixture]
         thermochemistry_library = 'cantera'
         species = 'H2 H O O2 OH H2O HO2 H2O2 Ar'
-        kinetics_data = 'hydrogen.xml'
+        kinetics_data = 'hydrogen_nasa7.xml'
 
         [./Cantera]
            verbose_read = 'true'
