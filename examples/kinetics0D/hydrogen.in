@@ -47,11 +47,11 @@
 [Materials]
   [./HydrogenGas]
      [./ThermodynamicPressure]
-        value =  '1e6' #[Pa]
+       value =  '1e6' #[Pa]
      [../GasMixture]
         thermochemistry_library = 'antioch'
         species = 'H2 H O O2 OH H2O HO2 H2O2 Ar'
-        kinetics_data = 'hydrogen.xml'
+        kinetics_data = 'hydrogen_nasa7.xml'
 
         [./Antioch]
            verbose_read = 'true'
