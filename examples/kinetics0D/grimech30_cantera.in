@@ -88,7 +88,7 @@
 # Visualization options
 [vis-options]
    output_vis = 'true'
-   vis_output_file_prefix = 'grimech30'
+   vis_output_file_prefix = 'grimech30_cantera'
    output_residual = 'false'
    output_format = 'xda'
 []
@@ -122,8 +122,6 @@
    [./IgnitionDelay]
 
      material = 'GriMech30Gas'
-
-     filename_prefix = 'grimech30'
 
      #ignition_type = 'fuel_consumption'
      #fuel_species = 'Y_H'

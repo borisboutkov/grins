@@ -132,8 +132,6 @@
 
      material = 'OzoneGas'
 
-     filename_prefix = 'ozone'
-
      ignition_type = 'fuel_consumption'
      fuel_species = 'Y_O3'
      fuel_consumption = '0.1' # 10% of initial fuel used up

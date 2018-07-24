@@ -135,8 +135,6 @@
 
      material = 'HydrogenGas'
 
-     filename_prefix = 'hydrogen'
-
      #ignition_type = 'fuel_consumption'
      #fuel_species = 'Y_H'
      #fuel_consumption = '0.1' # 10% of initial fuel used up

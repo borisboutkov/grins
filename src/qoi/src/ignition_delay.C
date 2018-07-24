@@ -59,8 +59,8 @@ namespace GRINS
   {
 
     // Parse input file for general IgnitionDelay parameters
-    if( input.have_variable("QoI/IgnitionDelay/filename_prefix") )
-      _filename_prefix = input("QoI/IgnitionDelay/filename_prefix","None");
+    if( input.have_variable("vis-options/vis_output_file_prefix") )
+      _filename_prefix = input("vis-options/vis_output_file_prefix","None");
     else
       libmesh_error_msg("ERROR: Could not QoI/IgnitionDelay/filename_prefix!");
 
