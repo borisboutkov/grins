@@ -32,7 +32,7 @@ print header
 #species_dilutants = ["Ar", "AR", "H2", "O2", "H2O"]
 species_dilutants = ["Ar", "AR"]
 
-require_species = ["H2", "H", "O", "O2", "OH", "CH4", "H2O"]
+require_species = ["H2", "H", "O", "O2", "O3", "OH", "CH4", "H2O"]
 require_species_idx = []
 exclude_species_idx = [0,1]; #also exclude time,Temperature data
 for h in header:
