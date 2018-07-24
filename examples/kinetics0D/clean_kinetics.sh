@@ -75,7 +75,7 @@ cd $FILEDIR
 echo $HEADERSTR >> $CWD/$OUTFILE
 
 # use a counter to ensure each file gets hit.
-proccessed_count=0
+PROCESSED_COUNT=0
 
 #'alphabetize' by the timestep counter
 for file in $(find . -name '*.xda' | ls -v *.xda)
@@ -83,7 +83,12 @@ do
     # Make sure we have files to work on ...
     if [ -f $file ]
     then
-        echo " Processing $file ..."
+
+        if [ $(( $PROCESSED_COUNT % 100 )) == 0 ]
+        then
+            echo " Processing $file ..."
+        fi
+
         PROCESSED_COUNT=$((PROCESSED_COUNT + 1 ))
 
         #first check file for unexpected errors
